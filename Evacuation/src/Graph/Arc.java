@@ -2,23 +2,23 @@ package Graph;
 
 public class Arc {
 
-	private int Node_pere;
-	private int Node_fils;
+	private int id_pere;
+	private int id_fils;
 	private int duedate;
 	private int length;
 	private int capacity;
 	
-	public Arc(int Node_pere,int Node_fils,int duedate, int length, int capacity) {
-		this.Node_pere=Node_pere;
-		this.Node_fils=Node_fils;
+	public Arc(int id_pere,int id_fils,int duedate, int length, int capacity) {
+		this.id_pere=id_pere;
+		this.id_fils=id_fils;
 		this.duedate=duedate;
 		this.length=length;
 		this.capacity=capacity;
 	}
 	
-	public Arc(int Node_pere,int Node_fils, int length, int capacity) {
-		this.Node_pere=Node_pere;
-		this.Node_fils=Node_fils;
+	public Arc(int id_pere,int id_fils, int length, int capacity) {
+		this.id_pere=id_pere;
+		this.id_fils=id_fils;
 		this.duedate=Integer.MAX_VALUE;
 		this.length=length;
 		this.capacity=capacity;
@@ -26,11 +26,11 @@ public class Arc {
 	
 	//GETTER
 	public int get_id_pere() {
-		return this.Node_pere;
+		return this.id_pere;
 	}
 	
 	public int get_id_fils() {
-		return this.Node_fils;
+		return this.id_fils;
 	}
 	
 	public int get_duedate() {
@@ -47,12 +47,12 @@ public class Arc {
 	
 	
 	//SETTER
-	public void set_id_pere(int Node_pere) {
-		this.Node_pere=Node_pere;
+	public void set_id_pere(int id_pere) {
+		this.id_pere=id_pere;
 	}
 	
-	public void set_id_fils(int Node_fils) {
-		this.Node_fils=Node_fils;
+	public void set_id_fils(int id_fils) {
+		this.id_fils=id_fils;
 	}
 	
 	public void set_duedate(int duedate) {
