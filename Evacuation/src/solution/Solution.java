@@ -80,4 +80,19 @@ public class Solution {
 	public void set_free_space(String comment) {
 		this.free_space=comment;
 	}
+	
+	public void print_solution() {
+		System.out.println(this.filename);
+		System.out.println(this.nb_evac_node);
+		
+		ListIterator<EvacNode> ite = this.list_evac_node.listIterator();
+		while(ite.hasNext()) {
+			EvacNode currentNode=ite.next();
+			System.out.println("idnode:" + currentNode.get_id_node() + " rate : " + currentNode.get_rate() + " date start evac : " + currentNode.get_start_evac());
+		}
+		System.out.println(this.is_valid);
+		System.out.println(this.date_end_evac);
+		System.out.println(this.method);
+		System.out.println(this.free_space);
+	}
 }

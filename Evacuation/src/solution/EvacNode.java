@@ -2,12 +2,12 @@ package solution;
 import Graph.*;
 
 public class EvacNode {
-	private Node node;
+	private int id_node;
 	private int rate;
 	private int start_evac;
 	
-	public EvacNode(Node node,int rate, int start_evac) {
-		this.node=node;
+	public EvacNode(int id_node,int rate, int start_evac) {
+		this.id_node=id_node;
 		this.rate=rate;
 		this.start_evac=start_evac;
 	}
@@ -15,8 +15,8 @@ public class EvacNode {
 	
 	//GETTER
 	
-	public Node get_Node() {
-		return this.node;
+	public int get_id_node() {
+		return this.id_node;
 	}
 	
 	public int get_rate() {
@@ -29,8 +29,8 @@ public class EvacNode {
 	
 	//SETTER
 	
-	public void set_Node(Node node) {
-		this.node=node;
+	public void set_id_node(int id) {
+		this.id_node=id;
 	}
 	
 	public void set_rate(int rate) {
