@@ -65,6 +65,30 @@ public class Checker {
 		}
 	}
 	
+	public boolean check_solution(Solution solution) {
+		boolean result = false;
+		int nb_arc
+		diagramme=matrice(date_end_evac;nb_arc);
+		int nb_evac_node;
+		for i in range (nb_evac_node) {
+			int time=date_start_evac;
+			arc=first_arc_evac;
+			for j in range (nb_arc_chemin_d_evacutation) {
+				if(time > date_end_evac) {
+					validity = false
+				}
+				for k in range (lenght of arc) {
+					diagramme(arc,time)+=rate;
+					if(diagramme(arc,time)> capacity of arc) {
+						validity=false;
+						break;
+					}
+				}
+				arc=next_arc;
+			}
+		}
+	}
+	
 	public static void main(String arg[]) {
 	String filename="exemple2.5";
 	String path = new File("src/Examples/"+filename+".txt").getAbsolutePath();
