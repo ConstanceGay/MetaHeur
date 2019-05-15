@@ -1,6 +1,9 @@
 package Graph;
 import java.io.IOException;
 import java.util.*;
+
+import solution.EvacNode;
+
 import java.io.*;
 
 public class Graph {
@@ -47,6 +50,20 @@ public class Graph {
 	
 	public int get_safe_node() {
 		return this.safe_node;
+	}
+	//return null if node not in graph
+	public Node get_node_by_id(int id) {
+		Node result=null;
+		
+		ListIterator<Node> ite = this.Nodes.listIterator();
+		while (result==null && ite.hasNext()) {
+			Node current_node=ite.next();
+			if(current_node.get_id()==id) {
+				result=current_node;
+			}
+		}
+		return result;
+		
 	}
 	//SETTER
 	
