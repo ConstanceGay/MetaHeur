@@ -1,5 +1,6 @@
 package solution;
 import java.util.*;
+import Graph.*;
 
 public class Solution {
 	private String filename;
@@ -10,6 +11,9 @@ public class Solution {
 	private String method;
 	private String free_space;
 	
+	
+	//CONSTRUCTORS
+	
 	public Solution(String filename,int nb_evac_node,ArrayList<EvacNode> list_evac_node,boolean is_valid,int date_end_evac,String method,String free_space) {
 		this.filename=filename;
 		this.nb_evac_node=nb_evac_node;
@@ -18,6 +22,33 @@ public class Solution {
 		this.date_end_evac=date_end_evac;
 		this.method=method;
 		this.free_space=free_space;
+	}
+	
+	public static Solution generate_infimum(Graph graph) {
+		ArrayList<Node> ListEvacNodeGraph=graph.get_evac_nodes();
+		ArrayList<EvacNode> ListEvacNodeSolution= new ArrayList<EvacNode>(); 
+		
+		ListIterator<Node> ite = ListEvacNodeGraph.listIterator();
+		int criticalTime=0;
+		while(ite.hasNext()) {
+			Node currentNode=ite.next();
+			ListEvacNodeSolution.add(new EvacNode(currentNode.get_id(),currentNode.get_max_rate(),0));
+			//calcul of total evacuation time for each evac node
+			int time=currentNode.get_arc().get_length()+currentNode.get_population()/currentNode.get_max_rate();
+			if(currentNode.get_population()%currentNode.get_max_rate()!=0) {
+				time++;
+			}
+			ArrayList<Integer> evacPath=currentNode.get_evac_path();
+			ListIterator<Integer> itePath=evacPath.listIterator();
+			while(itePath.hasNext()) {
+				int currentid=itePath.next();
+				time+=graph.get_node_by_id(currentid).get_arc().get_length();
+			}
+			if(time>criticalTime) {
+				time=criticalTime;
+			}
+		}
+		return new Solution("infimum",graph.get_nb_evac_nodes(),ListEvacNodeSolution,false,criticalTime,"infimum","");
 	}
 	
 	
