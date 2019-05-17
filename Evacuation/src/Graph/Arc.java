@@ -5,10 +5,10 @@ public class Arc {
 	private int id_pere;
 	private int id_fils;
 	private long duedate;
-	private float length;
+	private int length;
 	private float capacity;
 	
-	public Arc(int id_pere,int id_fils,long duedate, float length, float capacity) {
+	public Arc(int id_pere,int id_fils,long duedate, int length, float capacity) {
 		this.id_pere=id_pere;
 		this.id_fils=id_fils;
 		this.duedate=duedate;
@@ -16,7 +16,7 @@ public class Arc {
 		this.capacity=capacity;
 	}
 	
-	public Arc(int id_pere,int id_fils, float length, float capacity) {
+	public Arc(int id_pere,int id_fils, int length, float capacity) {
 		this.id_pere=id_pere;
 		this.id_fils=id_fils;
 		this.duedate=Integer.MAX_VALUE;
@@ -37,7 +37,7 @@ public class Arc {
 		return this.duedate;
 	}
 	
-	public float get_length() {
+	public int get_length() {
 		return this.length;
 	}
 	
@@ -59,7 +59,7 @@ public class Arc {
 		this.duedate=duedate;
 	}
 	
-	public void set_length(float length) {
+	public void set_length(int length) {
 		this.length=length;
 	}
 	
