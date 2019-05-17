@@ -54,12 +54,15 @@ public class Graph {
 	//return null if node not in graph
 	public Node get_node_by_id(int id) {
 		Node result=null;
+		boolean trouve=false;
 		
 		ListIterator<Node> ite = this.Nodes.listIterator();
-		while (result==null && ite.hasNext()) {
+		while (!trouve && ite.hasNext()) {
 			Node current_node=ite.next();
+			System.out.println(current_node.get_id());
 			if(current_node.get_id()==id) {
 				result=current_node;
+				trouve=true;
 			}
 		}
 		return result;
