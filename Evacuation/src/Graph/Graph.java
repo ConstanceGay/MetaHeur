@@ -94,22 +94,22 @@ public class Graph {
 				espace=line.indexOf(" ");
 				int id_node=Integer.parseInt(line.substring(0, (espace) ) );					//id of the node
 				line=line.substring((espace+1),(line.length()));
-				//System.out.println("The id of the node n°"+i+" is: "+id_node+"\n");
+				//System.out.println("The id of the node nï¿½"+i+" is: "+id_node+"\n");
 				
 				espace=line.indexOf(" ");
 				int population=Integer.parseInt(line.substring(0, (espace) ) );					//population of the node
 				line=line.substring((espace+1),(line.length()));
-				//System.out.println("The population of the node n°"+i+" is: "+population+"\n");
+				//System.out.println("The population of the node nï¿½"+i+" is: "+population+"\n");
 				
 				espace=line.indexOf(" ");
 				int max_rate=Integer.parseInt(line.substring(0, (espace) ) );					//max_rate of the node
 				line=line.substring((espace+1),(line.length()));
-				//System.out.println("The max_rate of the node n°"+i+" is: "+max_rate+"\n");
+				//System.out.println("The max_rate of the node nï¿½"+i+" is: "+max_rate+"\n");
 				
 				espace=line.indexOf(" ");
 				int k=Integer.parseInt(line.substring(0, (espace) ) );							//k (number of nodes on evac path) of the node
 				line=line.substring((espace+1),(line.length()));
-				//System.out.println("The k of the node n°"+i+" is: "+k+"\n");
+				//System.out.println("The k of the node nï¿½"+i+" is: "+k+"\n");
 				
 				ArrayList<Integer> chemin = new ArrayList<Integer>();							//evacuation path of the node				
 				for(int j=0;j<k;j++) {															//parse the evacuation path of the node
@@ -124,7 +124,7 @@ public class Graph {
 					chemin.add(id_nextnode);
 				}
 				ListNodeEvac.add(new Node(id_node,null,population,max_rate,chemin));			//add node to the list of nodes to evacuate
-				//System.out.println("For node n°"+i+" the path is: "+chemin.toString()+"\n");		
+				//System.out.println("For node nï¿½"+i+" the path is: "+chemin.toString()+"\n");		
 			}
 			bufferedReader.close();
 			
@@ -157,7 +157,7 @@ public class Graph {
 							line=line.substring((espace+1),(line.length()));
 							
 							espace=line.indexOf(" ");
-							float length=Float.parseFloat(line.substring(0, (espace) ) );		//retrieve length of arc
+							int length=Integer.parseInt(line.substring(0, (espace) ) );		//retrieve length of arc
 							line=line.substring((espace+1),(line.length()));
 							
 							float capacity=Float.parseFloat(line.substring(0, (espace) ) );		//retrieve capacity of arc
