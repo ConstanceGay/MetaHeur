@@ -80,8 +80,8 @@ public class Checker {
 			EvacNode currentEvacNode=iteEvacNode.next();			
 			Node currentNode=graph.get_node_by_id(currentEvacNode.get_id_node());
 			
-			System.out.println("Id of EvacNode : " + currentEvacNode.get_id_node());
-			System.out.println(currentNode);
+			//System.out.println("Id of EvacNode : " + currentEvacNode.get_id_node());
+			//System.out.println(currentNode);
 			
 			int time=currentEvacNode.get_start_evac();
 			int rate=currentEvacNode.get_rate(); //check rate OK
