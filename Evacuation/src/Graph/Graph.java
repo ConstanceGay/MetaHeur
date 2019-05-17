@@ -2,6 +2,8 @@ package Graph;
 import java.io.IOException;
 import java.util.*;
 
+import javax.xml.crypto.NodeSetData;
+
 import solution.EvacNode;
 
 import java.io.*;
@@ -59,7 +61,7 @@ public class Graph {
 		ListIterator<Node> ite = this.Nodes.listIterator();
 		while (!trouve && ite.hasNext()) {
 			Node current_node=ite.next();
-			System.out.println(current_node.get_id());
+			//System.out.println(current_node.get_id());
 			if(current_node.get_id()==id) {
 				result=current_node;
 				trouve=true;
@@ -91,30 +93,29 @@ public class Graph {
 			ArrayList<Node> ListNodeEvac = new ArrayList<Node>();								//List of nodes to evacuate
 			ArrayList<Node> ListNodeFinal = new ArrayList<Node>();								//List of all the nodes in the graph
 			
+			ListNodeFinal.add(new Node(id_safe_node,null));										//add the safe node to the list
+			
 			for(int i=0;i<nb_evac_nodes;i++) {													//iteration on all the evac_nodes
 				line=bufferedReader.readLine();
 				
 				espace=line.indexOf(" ");
 				int id_node=Integer.parseInt(line.substring(0, (espace) ) );					//id of the node
 				line=line.substring((espace+1),(line.length()));
-				//System.out.println("The id of the node n�"+i+" is: "+id_node+"\n");
 				
 				espace=line.indexOf(" ");
 				int population=Integer.parseInt(line.substring(0, (espace) ) );					//population of the node
 				line=line.substring((espace+1),(line.length()));
-				//System.out.println("The population of the node n�"+i+" is: "+population+"\n");
 				
 				espace=line.indexOf(" ");
 				int max_rate=Integer.parseInt(line.substring(0, (espace) ) );					//max_rate of the node
 				line=line.substring((espace+1),(line.length()));
-				//System.out.println("The max_rate of the node n�"+i+" is: "+max_rate+"\n");
 				
 				espace=line.indexOf(" ");
 				int k=Integer.parseInt(line.substring(0, (espace) ) );							//k (number of nodes on evac path) of the node
 				line=line.substring((espace+1),(line.length()));
-				//System.out.println("The k of the node n�"+i+" is: "+k+"\n");
 				
 				ArrayList<Integer> chemin = new ArrayList<Integer>();							//evacuation path of the node				
+				chemin.add(id_node);
 				for(int j=0;j<k;j++) {															//parse the evacuation path of the node
 					int id_nextnode;
 					if (j==(k-1)) {																//end of line
@@ -126,14 +127,16 @@ public class Graph {
 					}
 					chemin.add(id_nextnode);
 				}
-				ListNodeEvac.add(new Node(id_node,null,population,max_rate,chemin));			//add node to the list of nodes to evacuate
-				//System.out.println("For node n�"+i+" the path is: "+chemin.toString()+"\n");		
+				ListNodeEvac.add(new Node(id_node,null,population,max_rate,chemin));			//add node to the list of nodes to evacuate		
 			}
 			bufferedReader.close();
 			
 			//GETTING THE ARCS ON THE EVACUATION PATHS
-			for (int i=0;i<nb_evac_nodes;i++) {													//loop on all the evac nodes
-				ArrayList<Integer> current_path= ListNodeEvac.get(i).get_evac_path();			//get the evacuation path of the current node
+			ListIterator<Node> ite_list_evac = ListNodeEvac.listIterator();
+			
+			while (ite_list_evac.hasNext()) {													//loop on all the evac nodes
+				Node cur_evac_node = ite_list_evac.next();
+				ArrayList<Integer> current_path= cur_evac_node.get_evac_path();					//get the evacuation path of the current node
 				
 				for (int j=0;j<current_path.size()-1;j++) {										//loop on all the nodes of the evacuation path
 					fileReader=new FileReader(path);
@@ -160,37 +163,49 @@ public class Graph {
 							line=line.substring((espace+1),(line.length()));
 							
 							espace=line.indexOf(" ");
-							int length=Integer.parseInt(line.substring(0, (espace) ) );		//retrieve length of arc
+							int length=Integer.parseInt(line.substring(0, (espace) ) );			//retrieve length of arc
 							line=line.substring((espace+1),(line.length()));
 							
 							float capacity=Float.parseFloat(line.substring(0, (espace) ) );		//retrieve capacity of arc
 							line=line.substring(0,(line.length()));								//End of line
 							
 							Arc new_arc=new Arc(node1,node2,due_date,length,capacity);
-							//System.out.println("Found arc between "+node1+" and "+node2+" : "+due_date+" "+length+" "+capacity);
 							
-							ListIterator<Node> ite = ListNodeEvac.listIterator();				
-							boolean trouve_noeud=false;
-							while(ite.hasNext() && trouve_noeud) {
-								Node cur_node = ite.next();
-								if (cur_node.get_id()==node1) {									//checks if the node is an evacuation node
-									ListNodeEvac.remove(cur_node);								//it is removed from the list of nodes to evacuate 
-									cur_node.set_arc(new_arc);									//add the arc
-									ListNodeFinal.add(cur_node);								//if it is, it is added to the final graph, with its arc
-									ListNodeEvac.add(cur_node);									//it is added back into the list of nodes to evacuate, with its arc
-									trouve_noeud=true;
+							ListIterator<Node> iteNode = ListNodeFinal.listIterator();
+							boolean is_in_list=false;
+							while(iteNode.hasNext() && !is_in_list) {							//checks if node is already in the final list, so as not to add it again
+								Node cur_node = iteNode.next();
+								if(cur_node.get_id()==node1) {
+									is_in_list=true;
 								}
 							}
-							if (!trouve_noeud) { 
-								Node new_node = new Node(node1, new_arc);						//if not, a new node is created
-								ListNodeFinal.add(new_node);									//and added to the list of final nodes
+										
+							if(node1==cur_evac_node.get_id()) {									//checks if the node is an evacuation node
+									cur_evac_node.set_arc(new_arc);								//add the arc to the current evac_node (it'll change in both lists)
+									if(!is_in_list) {
+										ListNodeFinal.add(cur_evac_node);
+									}
+								
+							}else {
+								if(!is_in_list) {												//To not add it to the list again
+									Node new_node = new Node(node1, new_arc);					//if not, a new node is created
+									ListNodeFinal.add(new_node);								//and added to the list of final nodes
+								}
 							}
 						}
 						line=bufferedReader.readLine();
 					}
 					bufferedReader.close();
 				}
-			}
+			}			
+			Collections.sort(ListNodeFinal, new Comparator<Node>(){								//puts list in order
+				@Override
+				public int compare(Node arg0, Node arg1) {
+					return Integer.compare(arg0.get_id(), arg1.get_id());
+					
+				}
+	        });
+			
 			return new Graph(id_safe_node,ListNodeEvac,ListNodeFinal);							//a graph is created and returned
 		}
 		catch(IOException e) {
@@ -207,11 +222,38 @@ public class Graph {
 		ListIterator<Node> ite = this.get_evac_nodes().listIterator();				
 		while(ite.hasNext()) {
 			Node cur_node = ite.next();
-			System.out.println("ID: "+cur_node.get_id()+" || Population "+cur_node.get_population()+" || Max evacuation rate "+cur_node.get_max_rate());
+			System.out.println("ID: "+cur_node.get_id()+" || Population: "+cur_node.get_population()+" || Max evacuation rate: "+cur_node.get_max_rate());
 			System.out.println("Evacuation path: "+cur_node.get_evac_path().toString());
 			System.out.println();
 		}
 		
+		System.out.println("-------------------------------------");
+		System.out.println("COMPLETE LIST OF NODES");
+		System.out.println();
+		ListIterator<Node> ite2 = this.Nodes.listIterator();				
+		while(ite2.hasNext()) {
+			Node cur_node = ite2.next();
+			System.out.print("ID: "+cur_node.get_id());
+			if (cur_node.get_id()==(this.safe_node)) {
+				System.out.print(" !SAFE NODE!");
+			}else {
+				System.out.print(" || Arc to Node: "+cur_node.get_arc().get_id_fils());
+			}
+			System.out.println();
+		}
+		
+		System.out.println("-------------------------------------");
+		System.out.println("LIST OF EVACUATION ARCS");
+		System.out.println();
+		ListIterator<Node> ite3 = this.Nodes.listIterator();				
+		while(ite3.hasNext()) {
+			Node cur_node = ite3.next();
+			if(cur_node.get_id()!=this.safe_node) {
+				System.out.println("ID Origin: "+cur_node.get_id()+" || ID Destination: "+cur_node.get_arc().get_id_fils());
+				System.out.println("Capacity: "+cur_node.get_arc().get_capacity()+" || Duedate: "+cur_node.get_arc().get_duedate()+" || Length: "+cur_node.get_arc().get_length());
+				System.out.println();
+			}
+		}
 		System.out.println("-------------------------------------");
 		System.out.println("GRAPH INFORMATION\n");
 		System.out.println("Total number of nodes: "+this.get_nb_node());
