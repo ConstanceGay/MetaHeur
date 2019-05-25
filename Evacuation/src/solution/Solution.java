@@ -29,6 +29,7 @@ public class Solution {
 		ArrayList<EvacNode> ListEvacNodeSolution= new ArrayList<EvacNode>(); 
 		
 		ListIterator<Node> ite = ListEvacNodeGraph.listIterator();
+		//Each node will start the evacuation at time 0 and the end of the evacuation will be the critical time between all evacuation nodes
 		int criticalTime=0;
 		while(ite.hasNext()) {
 			Node currentNode=ite.next();
@@ -48,7 +49,38 @@ public class Solution {
 				time=criticalTime;
 			}
 		}
-		return new Solution("infimum",graph.get_nb_evac_nodes(),ListEvacNodeSolution,false,criticalTime,"infimum","");
+		Solution result = new Solution("infimum",graph.get_nb_evac_nodes(),ListEvacNodeSolution,false,criticalTime,"infimum","");
+		result.set_validity(Checker.check_solution(result, graph));
+		return result;
+	}
+	
+	public static Solution generate_maximum(Graph graph) {
+		ArrayList<Node> ListEvacNodeGraph = graph.get_evac_nodes();
+		ArrayList<EvacNode> ListEvacNodeSolution = new ArrayList<EvacNode>();
+		
+		ListIterator<Node> ite = ListEvacNodeGraph.listIterator();
+		//each node will evacuate when the preceding evacuation is done. The end of the evacuation will be when the last node is completely evacuated
+		int time = 0;
+		while(ite.hasNext()) {
+			Node currentNode = ite.next();
+			int rate=Math.max(currentNode.get_arc().get_capacity(), currentNode.get_max_rate());
+			ListEvacNodeSolution.add(new EvacNode(currentNode.get_id(),rate,time));
+			
+			time += currentNode.get_population()/rate;
+			if(currentNode.get_population()%rate != 0) {
+				time++;
+			}
+			
+			ArrayList<Integer> evacPath = currentNode.get_evac_path();
+			ListIterator<Integer> iteEvacPath = evacPath.listIterator();
+			while (iteEvacPath.hasNext()) {
+				int currentEvacNode = iteEvacPath.next();
+				time += graph.get_node_by_id(currentEvacNode).get_arc().get_length();
+			}
+		}
+		Solution result = new Solution("maximum",graph.get_nb_evac_nodes(),ListEvacNodeSolution,false,time,"maximum","");
+		result.set_validity(Checker.check_solution(result, graph));
+		return result;
 	}
 	
 	

@@ -22,6 +22,14 @@ public class Graph_test {
 			boolean valid = Checker.check_solution(solution, graph);
 			
 			System.out.println(valid);
+			
+			valid= Checker.check_solution(Solution.generate_infimum(graph), graph);
+			
+			System.out.println("L'infimum est :" +valid);
+			
+			valid= Checker.check_solution(Solution.generate_maximum(graph), graph);
+			
+			System.out.println(valid);
 		
 		}
 		
