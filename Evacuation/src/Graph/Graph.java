@@ -166,7 +166,7 @@ public class Graph {
 							int length=Integer.parseInt(line.substring(0, (espace) ) );			//retrieve length of arc
 							line=line.substring((espace+1),(line.length()));
 							
-							float capacity=Float.parseFloat(line);		//retrieve capacity of arc
+							int capacity= Integer.parseInt(line);		//retrieve capacity of arc
 							line=line.substring(0,(line.length()));								//End of line
 							
 							Arc new_arc=new Arc(node1,node2,due_date,length,capacity);
