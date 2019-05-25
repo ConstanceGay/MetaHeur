@@ -66,92 +66,76 @@ public class Checker {
 	}
 	
 	public static boolean check_solution(Solution solution, Graph graph) {
-		boolean valid = true;
-		int nb_nodes = graph.get_nb_node();
-		int date_end_evac=solution.get_date_end_evac();
+		//The solution is valid unless there is a proof against
+		boolean valid = true;		
 		
-		int[][] matrix= new int[date_end_evac][nb_nodes+1];
+		//this matrix represent the flow entering an arc at a specific time
+		int[][] matrix= new int[solution.get_date_end_evac()][graph.get_nb_node()+1];
 		
+		//We will iterate on all evac node checking the validity
 		ArrayList<EvacNode> ListEvacNode=solution.get_list_evac_node();
 		ListIterator<EvacNode> iteEvacNode = ListEvacNode.listIterator();
 		
 		
 		while(valid && iteEvacNode.hasNext()) {
+			
 			EvacNode currentEvacNode=iteEvacNode.next();			
 			Node currentNode=graph.get_node_by_id(currentEvacNode.get_id_node());
 			
-			//System.out.println("Id of EvacNode : " + currentEvacNode.get_id_node());
-			//System.out.println(currentNode);
 			
 			int time=currentEvacNode.get_start_evac();
-			int rate=currentEvacNode.get_rate(); //check rate OK
-			//check rate
-			int delta= currentNode.get_population()/currentEvacNode.get_rate();
-			int rest = currentNode.get_population() % currentEvacNode.get_rate();		
+			int rate=currentEvacNode.get_rate(); 
+			
+			//nb_packets is the number of subdivided groups of the evacuating population that are equals to the rate
+			int nb_packets= currentNode.get_population()/currentEvacNode.get_rate();
+			//the number of persons in the last packet
+			int last_packet = currentNode.get_population() % currentEvacNode.get_rate();		
 			
 			int arcLength= currentNode.get_arc().get_length();
-			
-			//first iteration
-			if(rest==0) {
-				valid= valid && time+delta < currentNode.get_arc().get_duedate();
-			}
-			else{
-				valid= valid && time+delta+1 < currentNode.get_arc().get_duedate();
-			}		
-			
-			int j;
-			for(j=time; j<time+delta;j++) {
-				matrix[j][currentNode.get_id()]+=rate;
-				valid= valid && matrix[j][currentNode.get_id()]<=currentNode.get_arc().get_capacity();
-			}
-			matrix[j][currentNode.get_id()]+=rest;
-			valid=valid && matrix[j][currentNode.get_id()]<currentNode.get_arc().get_capacity(); //check arc capacity
-			//end first iteration
-			
+	
+			//We will check all the evacuation path through this iterator
 			ArrayList<Integer> EvacPath=currentNode.get_evac_path();
 			ListIterator<Integer> iteEvacPath=EvacPath.listIterator();
-			
-			time += arcLength;
-			if(rest!=0)
-				time++;
 			
 			int currentNodePathid=-1;
 			while (valid && iteEvacPath.hasNext()) {
 				currentNodePathid=iteEvacPath.next();
+					//if this is not the last node of the evacuation path, we check the validity of the arc
 					if(currentNodePathid != graph.get_safe_node()) {
-						Node currentNodePath=graph.get_node_by_id(currentNodePathid);
 						
+						Node currentNodePath=graph.get_node_by_id(currentNodePathid);
 						arcLength=currentNodePath.get_arc().get_length();
 						
-						//check duedate
-						if(rest==0) {
-							valid= valid && time+delta < currentNodePath.get_arc().get_duedate();
+						//Checking that nobody enter an arc after the duedate
+						if(last_packet==0) {
+							valid= valid && time+nb_packets <= currentNodePath.get_arc().get_duedate();
 						}
 						else{
-							valid= valid && time+delta+1 < currentNodePath.get_arc().get_duedate();
+							valid= valid && time+nb_packets+1 <= currentNodePath.get_arc().get_duedate();
 						}
 						
-						
+						//Adding this flow of persons in the accurate arc at the accurate time in the matrix
 						int i;
-						for(i=time; i<time+delta;i++) {
+						for(i=time; i<time+nb_packets;i++) {
 							matrix[i][currentNodePathid]+=rate;
+							//Checking the arc overflow
 							valid= valid && matrix[i][currentNodePathid]<=currentNodePath.get_arc().get_capacity();
 						}
-						matrix[i][currentNodePathid]+=rest;
+						matrix[i][currentNodePathid]+=last_packet;
 						valid=valid && matrix[i][currentNodePathid]<currentNodePath.get_arc().get_capacity(); //check arc capacity
 						
-						//update time
+						//update time for the next arc
 						time += arcLength;
-						if(rest!=0) {
+						if(last_packet!=0) {
 							time++;
 						}
 					}
+					
+					//If this is the safe node, the evacuation is wrong if this is not the last node, ie there is a next node in the evacuation path
 					else {
-						valid=false;
+						valid=valid && !iteEvacPath.hasNext();
 					}
 			}
-			valid= valid && currentNodePathid == graph.get_safe_node();
-			
 		}
 		return valid;
 	}
