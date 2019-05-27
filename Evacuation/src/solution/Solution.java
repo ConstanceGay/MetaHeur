@@ -1,4 +1,5 @@
 package solution;
+import java.io.PrintWriter;
 import java.util.*;
 import Graph.*;
 
@@ -8,6 +9,7 @@ public class Solution {
 	private ArrayList<EvacNode> list_evac_node; 
 	private boolean is_valid;
 	private int date_end_evac;
+	private long calcul_time=0;
 	private String method;
 	private String free_space;
 	
@@ -24,7 +26,20 @@ public class Solution {
 		this.free_space=free_space;
 	}
 	
+	public Solution(String filename,int nb_evac_node,ArrayList<EvacNode> list_evac_node,boolean is_valid,int date_end_evac,long calcul_time,String method,String free_space) {
+		this.filename=filename;
+		this.nb_evac_node=nb_evac_node;
+		this.list_evac_node=list_evac_node;
+		this.is_valid=is_valid;
+		this.date_end_evac=date_end_evac;
+		this.calcul_time=calcul_time;
+		this.method=method;
+		this.free_space=free_space;
+	}
+	
 	public static Solution generate_infimum(Graph graph) {
+		long SystemTime = System.currentTimeMillis();
+		
 		ArrayList<Node> ListEvacNodeGraph=graph.get_evac_nodes();
 		ArrayList<EvacNode> ListEvacNodeSolution= new ArrayList<EvacNode>(); 
 		
@@ -33,10 +48,11 @@ public class Solution {
 		int criticalTime=0;
 		while(ite.hasNext()) {
 			Node currentNode=ite.next();
-			ListEvacNodeSolution.add(new EvacNode(currentNode.get_id(),currentNode.get_max_rate(),0));
+			int rate=Math.min(currentNode.get_arc().get_capacity(), currentNode.get_max_rate());
+			ListEvacNodeSolution.add(new EvacNode(currentNode.get_id(),rate,0));
 			//calcul of total evacuation time for each evac node
-			int time=currentNode.get_arc().get_length()+currentNode.get_population()/currentNode.get_max_rate();
-			if(currentNode.get_population()%currentNode.get_max_rate()!=0) {
+			int time=currentNode.get_arc().get_length()+currentNode.get_population()/rate;
+			if(currentNode.get_population()%rate!=0) {
 				time++;
 			}
 			ArrayList<Integer> evacPath=currentNode.get_evac_path();
@@ -46,15 +62,17 @@ public class Solution {
 				time+=graph.get_node_by_id(currentid).get_arc().get_length();
 			}
 			if(time>criticalTime) {
-				time=criticalTime;
+				criticalTime=time;
 			}
 		}
-		Solution result = new Solution("infimum",graph.get_nb_evac_nodes(),ListEvacNodeSolution,false,criticalTime,"infimum","");
+		Solution result = new Solution("infimum",graph.get_nb_evac_nodes(),ListEvacNodeSolution,false,criticalTime,(System.currentTimeMillis()-SystemTime),"infimum","");
 		result.set_validity(Checker.check_solution(result, graph));
 		return result;
 	}
 	
 	public static Solution generate_maximum(Graph graph) {
+		long SystemTime = System.currentTimeMillis();
+		
 		ArrayList<Node> ListEvacNodeGraph = graph.get_evac_nodes();
 		ArrayList<EvacNode> ListEvacNodeSolution = new ArrayList<EvacNode>();
 		
@@ -63,7 +81,7 @@ public class Solution {
 		int time = 0;
 		while(ite.hasNext()) {
 			Node currentNode = ite.next();
-			int rate=Math.max(currentNode.get_arc().get_capacity(), currentNode.get_max_rate());
+			int rate=Math.min(currentNode.get_arc().get_capacity(), currentNode.get_max_rate());
 			ListEvacNodeSolution.add(new EvacNode(currentNode.get_id(),rate,time));
 			
 			time += currentNode.get_population()/rate;
@@ -78,7 +96,7 @@ public class Solution {
 				time += graph.get_node_by_id(currentEvacNode).get_arc().get_length();
 			}
 		}
-		Solution result = new Solution("maximum",graph.get_nb_evac_nodes(),ListEvacNodeSolution,false,time,"maximum","");
+		Solution result = new Solution("maximum",graph.get_nb_evac_nodes(),ListEvacNodeSolution,false,time,(System.currentTimeMillis()-SystemTime),"maximum","");
 		result.set_validity(Checker.check_solution(result, graph));
 		return result;
 	}
@@ -157,5 +175,28 @@ public class Solution {
 		System.out.println(this.date_end_evac);
 		System.out.println(this.method);
 		System.out.println(this.free_space);
+	}
+	
+	public void write_file_solution(String path) {
+		try {
+			PrintWriter writer = new PrintWriter(path,"UTF-8");
+			writer.println(this.filename);
+			ListIterator<EvacNode> ite = this.get_list_evac_node().listIterator();
+			while(ite.hasNext()) {
+				writer.println(ite.next().toString());
+			}
+			if(this.is_valid) {
+				writer.println("valid");
+			}else {
+				writer.println("invalid");
+			}
+			writer.println(this.date_end_evac);
+			writer.println(this.calcul_time);
+			writer.println(this.method);
+			writer.println(this.free_space);
+			writer.close();
+		}catch(Exception e) {
+			System.out.println(e);
+		}
 	}
 }
