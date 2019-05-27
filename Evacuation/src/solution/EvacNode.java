@@ -40,5 +40,9 @@ public class EvacNode {
 	public void set_start_evac(int evac) {
 		this.start_evac=evac;
 	}
-	
+
+	//Tostring
+	public String toString() {
+		return(this.get_id_node() + " " + this.get_rate() + " " + this.get_start_evac());
+	}
 }
