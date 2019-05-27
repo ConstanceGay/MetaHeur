@@ -37,7 +37,7 @@ public class Solution {
 		this.free_space=free_space;
 	}
 	
-	public static Solution generate_infimum(Graph graph) {
+	public static Solution generate_infimum(Graph graph,String filename) {
 		long SystemTime = System.currentTimeMillis();
 		
 		ArrayList<Node> ListEvacNodeGraph=graph.get_evac_nodes();
@@ -59,18 +59,20 @@ public class Solution {
 			ListIterator<Integer> itePath=evacPath.listIterator();
 			while(itePath.hasNext()) {
 				int currentid=itePath.next();
-				time+=graph.get_node_by_id(currentid).get_arc().get_length();
+				if(currentid != graph.get_safe_node()) {
+					time+=graph.get_node_by_id(currentid).get_arc().get_length();
+				}
 			}
 			if(time>criticalTime) {
 				criticalTime=time;
 			}
 		}
-		Solution result = new Solution("infimum",graph.get_nb_evac_nodes(),ListEvacNodeSolution,false,criticalTime,(System.currentTimeMillis()-SystemTime),"infimum","");
+		Solution result = new Solution(filename,graph.get_nb_evac_nodes(),ListEvacNodeSolution,false,criticalTime,(System.currentTimeMillis()-SystemTime),"infimum","");
 		result.set_validity(Checker.check_solution(result, graph));
 		return result;
 	}
 	
-	public static Solution generate_maximum(Graph graph) {
+	public static Solution generate_maximum(Graph graph,String filename) {
 		long SystemTime = System.currentTimeMillis();
 		
 		ArrayList<Node> ListEvacNodeGraph = graph.get_evac_nodes();
@@ -93,10 +95,12 @@ public class Solution {
 			ListIterator<Integer> iteEvacPath = evacPath.listIterator();
 			while (iteEvacPath.hasNext()) {
 				int currentEvacNode = iteEvacPath.next();
-				time += graph.get_node_by_id(currentEvacNode).get_arc().get_length();
+				if(currentEvacNode != graph.get_safe_node()) {
+					time += graph.get_node_by_id(currentEvacNode).get_arc().get_length();
+				}
 			}
 		}
-		Solution result = new Solution("maximum",graph.get_nb_evac_nodes(),ListEvacNodeSolution,false,time,(System.currentTimeMillis()-SystemTime),"maximum","");
+		Solution result = new Solution(filename,graph.get_nb_evac_nodes(),ListEvacNodeSolution,false,time,(System.currentTimeMillis()-SystemTime),"maximum","");
 		result.set_validity(Checker.check_solution(result, graph));
 		return result;
 	}
@@ -181,6 +185,7 @@ public class Solution {
 		try {
 			PrintWriter writer = new PrintWriter(path,"UTF-8");
 			writer.println(this.filename);
+			writer.println(this.get_nb_evac_node());
 			ListIterator<EvacNode> ite = this.get_list_evac_node().listIterator();
 			while(ite.hasNext()) {
 				writer.println(ite.next().toString());

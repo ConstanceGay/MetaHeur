@@ -19,17 +19,13 @@ public class Graph_test {
 			
 			Solution solution = Checker.generate_solution_from_file("../Evacuation/src/Examples/"+filename+".txt");
 			
-			boolean valid = Checker.check_solution(solution, graph);
+			Solution infimum=Solution.generate_infimum(graph,filename);
+			System.out.println("L'infimum est valide : " + infimum.get_validity());
+			infimum.write_file_solution("../Evacuation/src/Examples/" + filename+"_infimum.txt");
 			
-			System.out.println(valid);
-			
-			valid= Checker.check_solution(Solution.generate_infimum(graph), graph);
-			
-			System.out.println("L'infimum est :" +valid);
-			
-			valid= Checker.check_solution(Solution.generate_maximum(graph), graph);
-			
-			System.out.println(valid);
+			Solution maximum=Solution.generate_maximum(graph,filename);
+			System.out.println("Le maximum est valide : " + maximum.get_validity());
+			maximum.write_file_solution("../Evacuation/src/Examples/" + filename+"_maximum.txt");
 		
 		}
 		

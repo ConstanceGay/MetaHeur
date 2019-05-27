@@ -3,7 +3,7 @@ example2.5
 1 8 0
 2 5 34
 3 3 65
-false
+invalid
 94
 0
 maximum
