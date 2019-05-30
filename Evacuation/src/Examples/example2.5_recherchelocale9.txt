@@ -1,0 +1,10 @@
+example2.5
+3
+1 8 24
+2 5 36
+3 3 65
+invalid
+88
+1
+Random with 50 neigbhors with parameters max_delta rate : 10 max_delta_start : 30
+

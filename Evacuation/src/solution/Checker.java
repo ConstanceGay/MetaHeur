@@ -115,19 +115,21 @@ public class Checker {
 						}
 						
 						//Adding this flow of persons in the accurate arc at the accurate time in the matrix
-						int i;
-						for(i=time; i<time+nb_packets;i++) {
-							matrix[i][currentNodePathid]+=rate;
-							//Checking the arc overflow
-							valid= valid && matrix[i][currentNodePathid]<=currentNodePath.get_arc().get_capacity();
-						}
-						matrix[i][currentNodePathid]+=last_packet;
-						valid=valid && matrix[i][currentNodePathid]<currentNodePath.get_arc().get_capacity(); //check arc capacity
-						
-						//update time for the next arc
-						time += arcLength;
-						if(last_packet!=0) {
-							time++;
+						if(valid) {
+							int i;
+							for(i=time; i<time+nb_packets;i++) {
+								matrix[i][currentNodePathid]+=rate;
+								//Checking the arc overflow
+								valid= valid && matrix[i][currentNodePathid]<=currentNodePath.get_arc().get_capacity();
+							}
+							matrix[i][currentNodePathid]+=last_packet;
+							valid=valid && matrix[i][currentNodePathid]<currentNodePath.get_arc().get_capacity(); //check arc capacity
+							
+							//update time for the next arc
+							time += arcLength;
+							if(last_packet!=0) {
+								time++;
+							}
 						}
 					}
 					
