@@ -76,12 +76,10 @@ public class Checker {
 		ArrayList<EvacNode> ListEvacNode=solution.get_list_evac_node();
 		ListIterator<EvacNode> iteEvacNode = ListEvacNode.listIterator();
 		
-		
 		while(valid && iteEvacNode.hasNext()) {
 			
 			EvacNode currentEvacNode=iteEvacNode.next();			
 			Node currentNode=graph.get_node_by_id(currentEvacNode.get_id_node());
-			
 			
 			int time=currentEvacNode.get_start_evac();
 			int rate=currentEvacNode.get_rate(); 
@@ -143,10 +141,10 @@ public class Checker {
 	}
 	
 	public static void main(String arg[]) {
-	String filename="example2.5";
-	String path = new File("src/Examples/"+filename+".txt").getAbsolutePath();
-	Solution solution = generate_solution_from_file(path); 
-	solution.print_solution();
+		String filename="example2.5";
+		String path = new File("src/Examples/"+filename+".txt").getAbsolutePath();
+		Solution solution = generate_solution_from_file(path); 
+		solution.print_solution();
 	}
 	
 	

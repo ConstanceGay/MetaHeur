@@ -67,6 +67,9 @@ public class Graph {
 				trouve=true;
 			}
 		}
+		if(result == null) {
+			System.out.println("Looking for "+id);
+		}
 		return result;
 		
 	}
@@ -135,6 +138,7 @@ public class Graph {
 			ListIterator<Node> ite_list_evac = ListNodeEvac.listIterator();
 			
 			while (ite_list_evac.hasNext()) {													//loop on all the evac nodes
+				
 				Node cur_evac_node = ite_list_evac.next();
 				ArrayList<Integer> current_path= cur_evac_node.get_evac_path();					//get the evacuation path of the current node
 				
@@ -155,45 +159,53 @@ public class Graph {
 						espace=line.indexOf(" ");
 						int node2=Integer.parseInt(line.substring(0, (espace) ) );				//get the second node
 						line=line.substring((espace+1),(line.length()));
+						/*
+						if(current_path.get(j) < current_path.get(j+1)) {
+							int aux = node1;
+							node1 = node2;
+							node2 = aux;
+						}*/
 						
-						if(node1==current_path.get(j) && node2==current_path.get(j+1)) {		//if they match the pair on the evac path:
+						if(node1==current_path.get(j) && node2==current_path.get(j+1) ||node1==current_path.get(j+1) && node2==current_path.get(j)) {		//if they match the pair on the evac path:
 							trouve=true;
 							espace=line.indexOf(" ");
 							long due_date=Long.parseLong(line.substring(0, (espace) ) );		//retrieve due date of arc
 							line=line.substring((espace+1),(line.length()));
 							
 							espace=line.indexOf(" ");
-							int length=Integer.parseInt(line.substring(0, (espace) ) );			//retrieve length of arc
+							int length=(int)Float.parseFloat(line.substring(0, (espace) ) );	//retrieve length of arc
 							line=line.substring((espace+1),(line.length()));
 							
-							int capacity= Integer.parseInt(line);		//retrieve capacity of arc
+							int capacity=(int)Float.parseFloat(line);							//retrieve capacity of arc
 							line=line.substring(0,(line.length()));								//End of line
 							
-							Arc new_arc=new Arc(node1,node2,due_date,length,capacity);
+							Arc new_arc=new Arc(current_path.get(j),current_path.get(j+1),due_date,length,capacity);
 							
 							ListIterator<Node> iteNode = ListNodeFinal.listIterator();
 							boolean is_in_list=false;
 							while(iteNode.hasNext() && !is_in_list) {							//checks if node is already in the final list, so as not to add it again
 								Node cur_node = iteNode.next();
-								if(cur_node.get_id()==node1) {
+								if(cur_node.get_id()==current_path.get(j)) {
 									is_in_list=true;
 								}
 							}
 										
-							if(node1==cur_evac_node.get_id()) {									//checks if the node is an evacuation node
+							if(current_path.get(j)==cur_evac_node.get_id()) {									//checks if the node is an evacuation node
 									cur_evac_node.set_arc(new_arc);								//add the arc to the current evac_node (it'll change in both lists)
 									if(!is_in_list) {
 										ListNodeFinal.add(cur_evac_node);
 									}
-								
 							}else {
 								if(!is_in_list) {												//To not add it to the list again
-									Node new_node = new Node(node1, new_arc);					//if not, a new node is created
+									Node new_node = new Node(current_path.get(j), new_arc);					//if not, a new node is created
 									ListNodeFinal.add(new_node);								//and added to the list of final nodes
 								}
 							}
 						}
 						line=bufferedReader.readLine();
+					}
+					if (!trouve) {
+						System.out.println("ATTENTION !! L'arc sortant du noeud : "+current_path.get(j)+" n'a pas été trouvé");
 					}
 					bufferedReader.close();
 				}

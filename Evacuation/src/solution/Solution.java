@@ -167,16 +167,11 @@ public class Solution {
 		int max_delta_rate=10;
 		int max_delta_start=10;
 		int size_neighborhood=50;
-		int size_compteur=20;
 		int nb_iteration = 20;
 		
 		Solution result=new Solution(this.get_filename(),this.get_nb_evac_node(),(ArrayList<EvacNode>) this.get_list_evac_node().clone(), false ,this.get_date_end_evac(),this.get_calcul_time(),method,"");
 		
-		
 		int z=result.get_date_end_evac();
-		
-		boolean done=false;
-		int compteur=0;
 		
 		for(int i=0; i<nb_iteration; i++) {
 			//choix solution
@@ -211,8 +206,8 @@ public class Solution {
 	public Solution recherche_locale_avec_diversification(Graph graph) {
 		int max_delta_rate=10;
 		int max_delta_start=10;
-		int size_neighborhood=50;
-		int size_compteur=20;
+		int size_neighborhood_start=50;
+		int nb_neighborhoods = 20;
 		int nb_iteration = 20;
 		
 		Random Generator = new Random();
@@ -221,34 +216,32 @@ public class Solution {
 		
 		int z=result.get_date_end_evac();
 		
-		boolean done=false;
-		int compteur=0;
-		
-		for(int i=0; i<nb_iteration; i++) {
-			//choix solution
-			ArrayList<Solution> neighborhood= new ArrayList<Solution>();
-			
-			//generate a certain number of solutions
-			neighborhood = result.generateNeighborhoodRandom(size_neighborhood, graph,max_delta_rate,max_delta_start);
-			
-			ListIterator<Solution> ite = neighborhood.listIterator();
-			while(ite.hasNext()) {
-				Solution temp=ite.next();
-				//temp.print_solution();
-				int heuristique= temp.get_date_end_evac();
+		for(int i=0; i<nb_neighborhoods; i++) {
+			for(int j=0; j<nb_iteration; j++) {
+				//choix solution
+				ArrayList<Solution> neighborhood= new ArrayList<Solution>();
 				
-				//put a true solution above a false one
-				if(!result.is_valid && temp.is_valid ) {
-					System.out.println(result.is_valid +" "+temp.is_valid);
-					result=temp;
-					z=heuristique;
-				//don't try to compare a true solution with a false one
-				}else if( !(result.is_valid && !temp.is_valid) && (heuristique < z) ) {
-					result=temp;
-					z=heuristique;
-				}				
+				//generate a certain number of solutions
+				neighborhood = result.generateNeighborhoodRandom(size_neighborhood_start+(10*i), graph,Generator.nextInt(max_delta_rate)+1,Generator.nextInt(max_delta_start)+1);
+				
+				ListIterator<Solution> ite = neighborhood.listIterator();
+				while(ite.hasNext()) {
+					Solution temp=ite.next();
+					//temp.print_solution();
+					int heuristique= temp.get_date_end_evac();
+					
+					//put a true solution above a false one
+					if(!result.is_valid && temp.is_valid ) {
+						result=temp;
+						z=heuristique;
+					//don't try to compare a true solution with a false one
+					}else if( !(result.is_valid && !temp.is_valid) && (heuristique < z) ) {
+						result=temp;
+						z=heuristique;
+					}				
+				}
 			}
-			
+			System.out.println("Resultat voisinage "+i+" : "+result.is_valid+" temps: "+result.date_end_evac+" temps de calcul: "+result.calcul_time);
 		}		
 		return result;
 	}
