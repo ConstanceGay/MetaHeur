@@ -55,10 +55,11 @@ public class Solution {
 			
 			//total evacuation time for each evac node
 			int time=currentNode.get_arc().get_length()+currentNode.get_population()/rate;		
-			if(currentNode.get_population()%rate!=0) {											
+			if(currentNode.get_population()%rate!=0) {										
 				time++;
 			}
 			
+			//Add the time it takes to cross each arc on the evacuation path
 			ArrayList<Integer> evacPath=currentNode.get_evac_path();
 			ListIterator<Integer> itePath=evacPath.listIterator();
 			while(itePath.hasNext()) {
@@ -68,7 +69,7 @@ public class Solution {
 				}
 			}
 			if(time>criticalTime) {
-				criticalTime=time;
+				criticalTime=time;				//stores the total evacuation time
 			}
 		}
 		
@@ -85,10 +86,12 @@ public class Solution {
 		ArrayList<EvacNode> ListEvacNodeSolution = new ArrayList<EvacNode>();
 		
 		ListIterator<Node> ite = ListEvacNodeGraph.listIterator();
-		//each node will evacuate when the preceding evacuation is done. The end of the evacuation will be when the last node is completely evacuated
+		//each node will evacuated when the preceding evacuation is done
+		//the end of the evacuation will be when the last node is completely evacuated
 		int time = 0;
 		while(ite.hasNext()) {
 			Node currentNode = ite.next();
+			//this time the rate is the minimum between arc capacity and max evacuation rate
 			int rate=Math.min(currentNode.get_arc().get_capacity(), currentNode.get_max_rate());
 			ListEvacNodeSolution.add(new EvacNode(currentNode.get_id(),rate,time));
 			
@@ -111,14 +114,16 @@ public class Solution {
 		return result;
 	}
 	
-	
+	//generates a list of solution
 	public ArrayList<Solution> generateNeighborhoodRandom(int nb_neighbor,Graph graph, int max_delta_rate, int max_delta_start){
 		int i;
 		String method="Random with " + nb_neighbor + " neigbhors with parameters max_delta rate : " + max_delta_rate + " max_delta_start : " + max_delta_start;
 		ArrayList<Solution> result=new ArrayList<Solution>();
+		
 		Random Generator = new Random();
 		for(i=0;i<nb_neighbor;i++) {
 			Solution temp=new Solution(this.get_filename(),this.get_nb_evac_node(),new ArrayList<EvacNode>(), false ,this.get_date_end_evac(),this.get_calcul_time(),method,"");
+			
 			ArrayList<EvacNode> EvacNodeList = this.list_evac_node;
 			ArrayList<EvacNode> ModifiedEvacNodeList = new ArrayList<EvacNode>();
 			ListIterator<EvacNode> ite = EvacNodeList.listIterator();
@@ -126,17 +131,22 @@ public class Solution {
 				EvacNode currentEvacNodeOrigin = ite.next();
 				EvacNode currentEvacNode = new EvacNode(currentEvacNodeOrigin.get_id_node(),currentEvacNodeOrigin.get_rate(),currentEvacNodeOrigin.get_start_evac());
 				Node currentNode = graph.get_node_by_id(currentEvacNode.get_id_node());
+				//random choice 
 				if(Generator.nextBoolean()) {
+					//min between : evac_rate+random(0-max_delta) OR max_rate of node 
 					currentEvacNode.set_rate(Math.min(currentEvacNode.get_rate()+Generator.nextInt(max_delta_rate),currentNode.get_max_rate()));
-				}
-				else {
+				} else {
+					//max between:  1 OR evac_rate-random(0-max_delta_rate) 
 					currentEvacNode.set_rate(Math.max(1,currentEvacNode.get_rate()-Generator.nextInt(max_delta_rate)));
 				}
+				
+				//another random choice
 				if(Generator.nextBoolean()) {
+					//augmenter date of start evac de random(0-max_delta_start) 
 					currentEvacNode.set_start_evac(currentEvacNode.get_start_evac()+Generator.nextInt(max_delta_start));
-				}
-				else {
-					currentEvacNode.set_start_evac(Math.max(0,currentEvacNode.get_start_evac()+Generator.nextInt(max_delta_start)));
+				} else {
+					//set date of start evac to max of 0 OR date_of_start+random(0,max_delta_start) 
+					currentEvacNode.set_start_evac(Math.max(0,currentEvacNode.get_start_evac()-Generator.nextInt(max_delta_start)));
 				}
 				ModifiedEvacNodeList.add(currentEvacNode);
 			}
@@ -145,67 +155,103 @@ public class Solution {
 			temp.set_method(method);
 			temp.set_validity(Checker.check_solution(temp, graph));
 			if(temp.get_validity()) {
-				System.out.println("CHEF! ON EN A TROUVE UN!");
+				//System.out.println("CHEF! ON EN A TROUVE UN!");
 			}
 			result.add(temp);
-			/*
-			System.out.println(temp.get_list_evac_node().get(0).get_rate() + "   " +temp.get_list_evac_node().get(0).get_start_evac());
-			System.out.println(temp.get_date_end_evac());*/
 		}
 		return result;
 	}
 	
 	//A utiliser si la solution de départ est valide. Peut trouver des solutions plus optis mais moins efficace que d'autres recherches
-	public Solution recherche_locale(Graph graph) {
+	public Solution recherche_locale_sans_diversification(Graph graph) {
 		int max_delta_rate=10;
 		int max_delta_start=10;
 		int size_neighborhood=50;
 		int size_compteur=20;
-		int handicap=50;
 		int nb_iteration = 20;
 		
 		Solution result=new Solution(this.get_filename(),this.get_nb_evac_node(),(ArrayList<EvacNode>) this.get_list_evac_node().clone(), false ,this.get_date_end_evac(),this.get_calcul_time(),method,"");
 		
+		
 		int z=result.get_date_end_evac();
-		if (!result.get_validity()) {
-			z+=handicap;
-		}
 		
 		boolean done=false;
 		int compteur=0;
 		
-		
-		
 		for(int i=0; i<nb_iteration; i++) {
 			//choix solution
-			System.out.println("Debut boucle avec comme objectif de faire mieux que : " + z);
+			//System.out.println("Debut boucle avec comme objectif de faire mieux que : " + z);
 			ArrayList<Solution> neighborhood= new ArrayList<Solution>();
+			
+			//generate a certain number of solutions
 			neighborhood = result.generateNeighborhoodRandom(size_neighborhood, graph,max_delta_rate,max_delta_start);
+			
 			ListIterator<Solution> ite = neighborhood.listIterator();
-			while(ite.hasNext() && !result.get_validity()) {
+			while(ite.hasNext()) {
 				Solution temp=ite.next();
-				temp.print_solution();
+				//temp.print_solution();
 				int heuristique= temp.get_date_end_evac();
 				
-				if(!temp.get_validity()) {
-					heuristique += handicap;
-				}
-				
-				//System.out.println(heuristique);
-				
-				if( heuristique < z) {
-					System.out.println(" On a trouvé mieux H : " + heuristique + "  z : " + z );
-					System.out.println("Nouvelle valeur date_end_evac : " + temp.get_date_end_evac());
+				//put a true solution above a false one
+				if(!result.is_valid && temp.is_valid ) {
+					System.out.println(result.is_valid +" "+temp.is_valid);
 					result=temp;
 					z=heuristique;
-				}
+				//don't try to compare a true solution with a false one
+				}else if( !(result.is_valid && !temp.is_valid) && (heuristique < z) ) {
+					result=temp;
+					z=heuristique;
+				}				
 			}
 			
-		}
-		System.out.println("Done");
+		}		
 		return result;
 	}
 	
+	public Solution recherche_locale_avec_diversification(Graph graph) {
+		int max_delta_rate=10;
+		int max_delta_start=10;
+		int size_neighborhood=50;
+		int size_compteur=20;
+		int nb_iteration = 20;
+		
+		Random Generator = new Random();
+		
+		Solution result=new Solution(this.get_filename(),this.get_nb_evac_node(),(ArrayList<EvacNode>) this.get_list_evac_node().clone(), false ,this.get_date_end_evac(),this.get_calcul_time(),method,"");
+		
+		int z=result.get_date_end_evac();
+		
+		boolean done=false;
+		int compteur=0;
+		
+		for(int i=0; i<nb_iteration; i++) {
+			//choix solution
+			ArrayList<Solution> neighborhood= new ArrayList<Solution>();
+			
+			//generate a certain number of solutions
+			neighborhood = result.generateNeighborhoodRandom(size_neighborhood, graph,max_delta_rate,max_delta_start);
+			
+			ListIterator<Solution> ite = neighborhood.listIterator();
+			while(ite.hasNext()) {
+				Solution temp=ite.next();
+				//temp.print_solution();
+				int heuristique= temp.get_date_end_evac();
+				
+				//put a true solution above a false one
+				if(!result.is_valid && temp.is_valid ) {
+					System.out.println(result.is_valid +" "+temp.is_valid);
+					result=temp;
+					z=heuristique;
+				//don't try to compare a true solution with a false one
+				}else if( !(result.is_valid && !temp.is_valid) && (heuristique < z) ) {
+					result=temp;
+					z=heuristique;
+				}				
+			}
+			
+		}		
+		return result;
+	}
 	
 	//GETTER
 	
