@@ -140,6 +140,7 @@ public class Graph {
 			while (ite_list_evac.hasNext()) {													//loop on all the evac nodes
 				
 				Node cur_evac_node = ite_list_evac.next();
+				System.out.println("Looping on evac node : "+cur_evac_node.get_id());
 				ArrayList<Integer> current_path= cur_evac_node.get_evac_path();					//get the evacuation path of the current node
 				
 				for (int j=0;j<current_path.size()-1;j++) {										//loop on all the nodes of the evacuation path
@@ -191,10 +192,12 @@ public class Graph {
 							}
 										
 							if(current_path.get(j)==cur_evac_node.get_id()) {									//checks if the node is an evacuation node
+									System.out.println("Matched evac node "+cur_evac_node.get_id()+" ? "+is_in_list);
 									cur_evac_node.set_arc(new_arc);								//add the arc to the current evac_node (it'll change in both lists)
-									if(!is_in_list) {
-										ListNodeFinal.add(cur_evac_node);
+									if(is_in_list) {
+										ListNodeFinal.removeIf(n -> n.get_id()==cur_evac_node.get_id());
 									}
+									ListNodeFinal.add(cur_evac_node);
 							}else {
 								if(!is_in_list) {												//To not add it to the list again
 									Node new_node = new Node(current_path.get(j), new_arc);					//if not, a new node is created
@@ -225,6 +228,22 @@ public class Graph {
 			return null;
 		}
 	}
+	
+	public void show_all_nodes() {
+		System.out.println("NODES\n");
+		ListIterator<Node> ite = this.get_nodes().listIterator();				
+		while(ite.hasNext()) {
+			Node cur_node = ite.next();
+			System.out.println("ID: "+cur_node.get_id()+" || Population: "+cur_node.get_population()+" || Max evacuation rate: "+cur_node.get_max_rate());
+			if(cur_node.get_evac_path()==null) {
+				System.out.println("Evacuation path: null");
+			}else {
+				System.out.println("Evacuation path: "+cur_node.get_evac_path().toString());
+			}
+			System.out.println();
+		}
+	}
+	
 	public void show_graph() {
 		System.out.println("EVACUATION INFORMATION\n");
 		System.out.println("Number of nodes to evacuate: "+this.get_nb_evac_nodes()+"\n");

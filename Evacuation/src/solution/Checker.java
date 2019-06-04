@@ -2,6 +2,9 @@ package solution;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.ListIterator;
 import java.io.*;
 import Graph.*;
@@ -65,17 +68,26 @@ public class Checker {
 		}
 	}
 	
+	public static ArrayList<Integer> create_int_list(ArrayList<Node> list) {
+		ArrayList<Integer> int_list = new ArrayList<Integer>();
+		ListIterator<Node> ite = list.listIterator();
+		while(ite.hasNext()) {	
+			Node cur=ite.next();
+			int_list.add(cur.get_id());
+		}
+		return int_list;
+	}
+	
 	public static boolean check_solution(Solution solution, Graph graph) {
 		//The solution is valid unless there is a proof against
 		boolean valid = true;		
-		
+		ArrayList<Integer> list = create_int_list(graph.get_nodes());
 		//this matrix represent the flow entering an arc at a specific time
 		int[][] matrix= new int[solution.get_date_end_evac()][graph.get_nb_node()+1];
 		
 		//We will iterate on all evac node checking the validity
 		ArrayList<EvacNode> ListEvacNode=solution.get_list_evac_node();
 		ListIterator<EvacNode> iteEvacNode = ListEvacNode.listIterator();
-		
 		while(valid && iteEvacNode.hasNext()) {
 			
 			EvacNode currentEvacNode=iteEvacNode.next();			
@@ -94,7 +106,6 @@ public class Checker {
 			//We will check all the evacuation path through this iterator
 			ArrayList<Integer> EvacPath=currentNode.get_evac_path();
 			ListIterator<Integer> iteEvacPath=EvacPath.listIterator();
-			
 			int currentNodePathid=-1;
 			while (valid && iteEvacPath.hasNext()) {
 				currentNodePathid=iteEvacPath.next();
@@ -116,12 +127,12 @@ public class Checker {
 						if(valid) {
 							int i;
 							for(i=time; i<time+nb_packets;i++) {
-								matrix[i][currentNodePathid]+=rate;
+								matrix[i][list.indexOf(currentNodePathid)]+=rate;
 								//Checking the arc overflow
-								valid= valid && matrix[i][currentNodePathid]<=currentNodePath.get_arc().get_capacity();
+								valid= valid && matrix[i][list.indexOf(currentNodePathid)]<=currentNodePath.get_arc().get_capacity();
 							}
-							matrix[i][currentNodePathid]+=last_packet;
-							valid=valid && matrix[i][currentNodePathid]<currentNodePath.get_arc().get_capacity(); //check arc capacity
+							matrix[i][list.indexOf(currentNodePathid)]+=last_packet;
+							valid=valid && matrix[i][list.indexOf(currentNodePathid)]<currentNodePath.get_arc().get_capacity(); //check arc capacity
 							
 							//update time for the next arc
 							time += arcLength;

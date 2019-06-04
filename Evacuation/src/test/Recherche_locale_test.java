@@ -9,7 +9,12 @@ public class Recherche_locale_test {
 	public static void main(String args[]) {
 		String filename="sparse_10_30_3_1";
 		String path = new File("../Instances/"+filename+".full").getAbsolutePath();
+		/*String filename="example2.5";
+		String path = new File("src/Examples/"+filename+".full").getAbsolutePath();*/
+		
 		Graph graph = Graph.generate_from_file(path); 
+		graph.show_graph();
+		//graph.show_all_nodes();
 		
 		//Solution solution = Checker.generate_solution_from_file("../Evacuation/src/Examples/"+filename+".txt");
 		
@@ -31,6 +36,6 @@ public class Recherche_locale_test {
 		Solution local_infimum2 = maximum.recherche_locale_avec_diversification(graph);
 		System.out.println("Le local_infimum est valide : " + local_infimum2.get_validity());
 		System.out.println(("Le temps d'evac du local_infimum est: "+local_infimum2.get_date_end_evac()));
-		local_infimum.write_file_solution("../Evacuation/src/Examples/"+filename+"_recherchelocale_avec_div_1.txt");
+		local_infimum2.write_file_solution("../Evacuation/src/Examples/"+filename+"_recherchelocale_avec_div_1.txt"); 
 	}
 }

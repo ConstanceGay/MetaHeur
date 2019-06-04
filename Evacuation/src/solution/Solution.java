@@ -71,9 +71,8 @@ public class Solution {
 			if(time>criticalTime) {
 				criticalTime=time;				//stores the total evacuation time
 			}
-		}
-		
-		Solution result = new Solution(filename,graph.get_nb_evac_nodes(),ListEvacNodeSolution,false,criticalTime,(System.currentTimeMillis()-SystemTime),"infimum","");
+		}		
+		Solution result = new Solution(filename,graph.get_nb_evac_nodes(),ListEvacNodeSolution,false,criticalTime,System.currentTimeMillis()-SystemTime,"infimum","");
 		result.set_validity(Checker.check_solution(result, graph));
 		return result;
 	}
@@ -155,7 +154,7 @@ public class Solution {
 			temp.set_method(method);
 			temp.set_validity(Checker.check_solution(temp, graph));
 			if(temp.get_validity()) {
-				//System.out.println("CHEF! ON EN A TROUVE UN!");
+				System.out.println("CHEF! ON EN A TROUVE UN!");
 			}
 			result.add(temp);
 		}
@@ -164,10 +163,10 @@ public class Solution {
 	
 	//A utiliser si la solution de départ est valide. Peut trouver des solutions plus optis mais moins efficace que d'autres recherches
 	public Solution recherche_locale_sans_diversification(Graph graph) {
-		int max_delta_rate=10;
-		int max_delta_start=10;
+		int max_delta_rate=72;
+		int max_delta_start=50;
 		int size_neighborhood=50;
-		int nb_iteration = 20;
+		int nb_iteration = 1000;
 		
 		Solution result=new Solution(this.get_filename(),this.get_nb_evac_node(),(ArrayList<EvacNode>) this.get_list_evac_node().clone(), false ,this.get_date_end_evac(),this.get_calcul_time(),method,"");
 		
@@ -204,11 +203,13 @@ public class Solution {
 	}
 	
 	public Solution recherche_locale_avec_diversification(Graph graph) {
-		int max_delta_rate=10;
-		int max_delta_start=10;
+		int max_delta_rate=70;
+		int max_delta_start=70;
 		int size_neighborhood_start=50;
-		int nb_neighborhoods = 20;
+		int nb_neighborhoods = 30;
 		int nb_iteration = 20;
+		
+		long SystemTime = System.currentTimeMillis();
 		
 		Random Generator = new Random();
 		
@@ -222,7 +223,7 @@ public class Solution {
 				ArrayList<Solution> neighborhood= new ArrayList<Solution>();
 				
 				//generate a certain number of solutions
-				neighborhood = result.generateNeighborhoodRandom(size_neighborhood_start+(10*i), graph,Generator.nextInt(max_delta_rate)+1,Generator.nextInt(max_delta_start)+1);
+				neighborhood = result.generateNeighborhoodRandom(size_neighborhood_start+(100*i), graph,Generator.nextInt(max_delta_rate)+1,Generator.nextInt(max_delta_start)+1);
 				
 				ListIterator<Solution> ite = neighborhood.listIterator();
 				while(ite.hasNext()) {
@@ -241,8 +242,9 @@ public class Solution {
 					}				
 				}
 			}
-			System.out.println("Resultat voisinage "+i+" : "+result.is_valid+" temps: "+result.date_end_evac+" temps de calcul: "+result.calcul_time);
-		}		
+			System.out.println("Resultat voisinage "+i+" : "+result.is_valid+" temps: "+result.date_end_evac+" temps de calcul: "+(System.currentTimeMillis() - SystemTime));
+		}	
+		result.set_calcul_time(System.currentTimeMillis() - SystemTime);
 		return result;
 	}
 	
@@ -308,6 +310,10 @@ public class Solution {
 	
 	public void set_free_space(String comment) {
 		this.free_space=comment;
+	}
+	
+	public void set_calcul_time(long time) {
+		this.calcul_time = time;
 	}
 	
 	public void compute_end_date_evac(Graph graph) {

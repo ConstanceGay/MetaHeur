@@ -12,6 +12,6 @@ sparse_10_30_3_1
 138 224 0
 invalid
 2396
-0
+15
 infimum
 

@@ -1,0 +1,17 @@
+sparse_10_30_3_1
+10
+107 72 907
+167 58 702
+156 72 1326
+128 77 1122
+130 165 1141
+134 69 706
+177 65 1046
+190 74 0
+77 172 1029
+138 143 1376
+invalid
+2272
+0
+Random with 50 neigbhors with parameters max_delta rate : 72 max_delta_start : 50
+
