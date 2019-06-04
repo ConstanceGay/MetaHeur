@@ -37,6 +37,7 @@ public class Solution {
 		this.free_space=free_space;
 	}
 	
+	//Function to generate an infimum (borne inférieure)
 	public static Solution generate_infimum(Graph graph,String filename) {
 		long SystemTime = System.currentTimeMillis();
 		
@@ -44,17 +45,20 @@ public class Solution {
 		ArrayList<EvacNode> ListEvacNodeSolution= new ArrayList<EvacNode>(); 
 		
 		ListIterator<Node> ite = ListEvacNodeGraph.listIterator();
-		//Each node will start the evacuation at time 0 and the end of the evacuation will be the critical time between all evacuation nodes
+		//Each node will start the evacuation at time 0 
+		//end of the evacuation will be the critical time between all evacuation nodes
 		int criticalTime=0;
 		while(ite.hasNext()) {
 			Node currentNode=ite.next();
-			int rate=Math.min(currentNode.get_arc().get_capacity(), currentNode.get_max_rate());
+			int rate=Math.min(currentNode.get_arc().get_capacity(), currentNode.get_max_rate());	//evacuation rate is the min between arc capacity and max evacuation rate
 			ListEvacNodeSolution.add(new EvacNode(currentNode.get_id(),rate,0));
-			//calcul of total evacuation time for each evac node
-			int time=currentNode.get_arc().get_length()+currentNode.get_population()/rate;
-			if(currentNode.get_population()%rate!=0) {
+			
+			//total evacuation time for each evac node
+			int time=currentNode.get_arc().get_length()+currentNode.get_population()/rate;		
+			if(currentNode.get_population()%rate!=0) {											
 				time++;
 			}
+			
 			ArrayList<Integer> evacPath=currentNode.get_evac_path();
 			ListIterator<Integer> itePath=evacPath.listIterator();
 			while(itePath.hasNext()) {
@@ -67,11 +71,13 @@ public class Solution {
 				criticalTime=time;
 			}
 		}
+		
 		Solution result = new Solution(filename,graph.get_nb_evac_nodes(),ListEvacNodeSolution,false,criticalTime,(System.currentTimeMillis()-SystemTime),"infimum","");
 		result.set_validity(Checker.check_solution(result, graph));
 		return result;
 	}
 	
+	//Function to generate a maximum (borne supérieure)
 	public static Solution generate_maximum(Graph graph,String filename) {
 		long SystemTime = System.currentTimeMillis();
 		
@@ -104,6 +110,7 @@ public class Solution {
 		result.set_validity(Checker.check_solution(result, graph));
 		return result;
 	}
+	
 	
 	public ArrayList<Solution> generateNeighborhoodRandom(int nb_neighbor,Graph graph, int max_delta_rate, int max_delta_start){
 		int i;
