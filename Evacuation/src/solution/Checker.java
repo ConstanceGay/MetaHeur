@@ -2,9 +2,6 @@ package solution;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.ListIterator;
 import java.io.*;
 import Graph.*;
@@ -77,9 +74,12 @@ public class Checker {
 		return int_list;
 	}
 	
-	public static boolean check_solution(Solution solution, Graph graph) {
+	public static Checker_message check_solution(Solution solution, Graph graph) {
 		//The solution is valid unless there is a proof against
-		boolean valid = true;		
+		boolean valid = true;	
+		String reason = " ";
+		int noeud = -1;
+		
 		ArrayList<Integer> list = create_int_list(graph.get_nodes());
 		
 		//this matrix represent the flow entering an arc at a specific time
@@ -111,8 +111,6 @@ public class Checker {
 			int currentNodePathid=-1;
 			while (valid && iteEvacPath.hasNext()) {
 				currentNodePathid=iteEvacPath.next();
-				//System.out.println();
-				//System.out.println("Checker : On traite sur le chemin d evac le noeud "+currentNodePathid);
 					//if this is not the last node of the evacuation path, we check the validity of the arc
 					if(currentNodePathid != graph.get_safe_node()) {
 						//System.out.println("Checker : ce n'est pas le safe node");
@@ -127,6 +125,10 @@ public class Checker {
 						}
 						else{
 							valid= valid &&  time +nb_packets+1 <= currentNodePath.get_arc().get_duedate();
+						}
+						if(!valid) {
+							reason = "duedate";
+							noeud = currentNodePath.get_id(); 
 						}
 						//System.out.println("Checker : personne n'entre dans l'arc après sa duedate : "+valid);
 						
@@ -145,16 +147,32 @@ public class Checker {
 							
 							//update time for the next arc
 							time += arcLength;
+							if(!valid) {
+								reason = "overflow";
+								noeud = currentNodePath.get_id();
+							}
 						}
 					}
-					
 					//If this is the safe node, the evacuation is wrong if this is not the last node, ie there is a next node in the evacuation path
 					else {
 						valid=valid && !iteEvacPath.hasNext();
 					}
 			}
 		}
-		return valid;
+		ArrayList<Integer> pb_list = null;
+		
+		//on cherche les noeuds d'evac concernés pas le problème
+ 		if (noeud != -1) {
+ 			pb_list = new ArrayList<Integer>();
+ 			ListIterator<Node> iteEvac=graph.get_evac_nodes().listIterator();
+			while (iteEvac.hasNext()) {
+				Node currentNode=iteEvac.next();
+				if(currentNode.get_evac_path().contains(noeud)) {
+					pb_list.add(currentNode.get_id());
+				}
+			}
+		} 		
+		return new Checker_message(valid,reason,pb_list);
 	}
 	
 	public static void main(String arg[]) {

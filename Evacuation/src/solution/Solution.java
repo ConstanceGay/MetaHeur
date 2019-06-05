@@ -37,6 +37,8 @@ public class Solution {
 		this.free_space=free_space;
 	}
 	
+//BORNES	
+	
 	//Function to generate an infimum (borne inférieure)
 	public static Solution generate_infimum(Graph graph,String filename) {
 		long SystemTime = System.currentTimeMillis();
@@ -54,8 +56,8 @@ public class Solution {
 			ListEvacNodeSolution.add(new EvacNode(currentNode.get_id(),rate,0));
 			
 			//total evacuation time for each evac node
-			int time=currentNode.get_arc().get_length()+currentNode.get_population()/rate;	
-			System.out.println("On a un temps d'evac de "+time+" avec un arc de longueur "+currentNode.get_arc().get_length()+" une population de "+currentNode.get_population()+" une rate de "+rate);
+			int time=currentNode.get_population()/rate;	
+			//System.out.println("On a un temps d'evac de "+time+" avec un arc de longueur "+currentNode.get_arc().get_length()+" une population de "+currentNode.get_population()+" une rate de "+rate);
 			if(currentNode.get_population()%rate!=0) {										
 				time++;
 			}
@@ -74,9 +76,11 @@ public class Solution {
 			}
 		}		
 		Solution result = new Solution(filename,graph.get_nb_evac_nodes(),ListEvacNodeSolution,false,criticalTime,System.currentTimeMillis()-SystemTime,"infimum","");
-		result.set_validity(Checker.check_solution(result, graph));
+		result.set_validity(Checker.check_solution(result, graph).get_validity());
 		return result;
 	}
+	
+// LOCAL SEARCH	
 	
 	//Function to generate a maximum (borne supérieure)
 	public static Solution generate_maximum(Graph graph,String filename) {
@@ -110,9 +114,133 @@ public class Solution {
 			}
 		}
 		Solution result = new Solution(filename,graph.get_nb_evac_nodes(),ListEvacNodeSolution,false,time,(System.currentTimeMillis()-SystemTime),"maximum","");
-		result.set_validity(Checker.check_solution(result, graph));
+		result.set_validity(Checker.check_solution(result, graph).get_validity());
 		return result;
 	}
+	
+	
+	public ArrayList<Solution> generate_Neighborhood_DATE (Graph graph, int max_delta_date,ArrayList<Integer> list_pb){
+		int i;
+		String method="Rate change neigbhors with parameters max_delta rate : " + max_delta_date;
+		ArrayList<Solution> result=new ArrayList<Solution>();
+		Random Generator = new Random();
+		
+		for(i=1;i<=max_delta_date+1;i++) {
+			Solution temp1=new Solution(this.get_filename(),this.get_nb_evac_node(),new ArrayList<EvacNode>(), false ,this.get_date_end_evac(),this.get_calcul_time(),method,"");
+			
+			ArrayList<EvacNode> EvacNodeList = this.list_evac_node;
+			ArrayList<EvacNode> ModifiedEvacNodeList1 = new ArrayList<EvacNode>();
+			ListIterator<EvacNode> ite = EvacNodeList.listIterator();
+			//int Evac_Node = 0;															//id of evac node to modify on this loop
+			while(ite.hasNext()) {
+				EvacNode currentEvacNodeOrigin = ite.next();
+				EvacNode currentEvacNode1 = new EvacNode(currentEvacNodeOrigin.get_id_node(),currentEvacNodeOrigin.get_rate(),currentEvacNodeOrigin.get_start_evac());
+				
+				if (Generator.nextBoolean()) {				//chooses randomly which nodes to change
+					currentEvacNode1.set_start_evac(Math.max(0,currentEvacNode1.get_start_evac()-max_delta_date));
+				}
+				ModifiedEvacNodeList1.add(currentEvacNode1);  
+			}
+			temp1.set_list_evac_node(ModifiedEvacNodeList1);
+			temp1.compute_end_date_evac(graph);
+			temp1.set_validity(Checker.check_solution(temp1, graph).get_validity());
+			result.add(temp1);
+		}
+		return result;
+	}
+	
+	public ArrayList<Solution> generate_Neighborhood_RATE (Graph graph, int max_delta_rate,ArrayList<Integer> list_pb){
+		int i;
+		String method="Rate change neigbhors with parameters max_delta rate : " + max_delta_rate;
+		ArrayList<Solution> result=new ArrayList<Solution>();
+		Random Generator = new Random();
+		
+		int Evac_Node=0;
+		for(i=1;i<=max_delta_rate+1;i++) {												//id of evac node to modify on this loop
+			Solution temp1=new Solution(this.get_filename(),this.get_nb_evac_node(),new ArrayList<EvacNode>(), false ,this.get_date_end_evac(),this.get_calcul_time(),method,"");
+			
+			ArrayList<EvacNode> EvacNodeList = this.list_evac_node;
+			ArrayList<EvacNode> ModifiedEvacNodeList1 = new ArrayList<EvacNode>();
+			ListIterator<EvacNode> ite = EvacNodeList.listIterator();
+			while(ite.hasNext()) {
+				EvacNode currentEvacNodeOrigin = ite.next();
+				EvacNode currentEvacNode1 = new EvacNode(currentEvacNodeOrigin.get_id_node(),currentEvacNodeOrigin.get_rate(),currentEvacNodeOrigin.get_start_evac());
+				
+				if(Generator.nextBoolean()) {
+					int new_rate= Math.max(1,(currentEvacNode1.get_rate()-max_delta_rate));
+					currentEvacNode1.set_rate(new_rate);
+				}
+				ModifiedEvacNodeList1.add(currentEvacNode1);				
+			}
+			temp1.set_list_evac_node(ModifiedEvacNodeList1);
+			temp1.compute_end_date_evac(graph);
+			temp1.set_validity(Checker.check_solution(temp1, graph).get_validity());
+			result.add(temp1);
+			if(Evac_Node == EvacNodeList.size()-1) {
+				Evac_Node=0;
+			}else {
+				Evac_Node++;
+			}
+		}
+		return result;
+	}
+	
+	public Solution recherche_locale(Graph graph) {
+		int max_delta_rate=2000;
+		int max_delta_start=1000;
+		int nb_iteration = 100;
+		
+		Solution last_sol = this;
+		int duedate_in_row = 1;
+		int rate_in_row=1;
+		
+		Solution result=new Solution(this.get_filename(),this.get_nb_evac_node(),(ArrayList<EvacNode>) this.get_list_evac_node().clone(), false ,this.get_date_end_evac(),this.get_calcul_time(),method,"");
+		Checker_message pb_message = Checker.check_solution(this, graph);
+		int z=result.get_date_end_evac();
+		for(int i=0; i<nb_iteration; i++) {
+			//choix solution
+			if(!result.is_valid) {
+				ArrayList<Solution> neighborhood= new ArrayList<Solution>();
+				
+				if (pb_message.get_reason().equals("duedate")) {
+					duedate_in_row++;
+					rate_in_row = 1;
+					neighborhood = result.generate_Neighborhood_DATE(graph,duedate_in_row,pb_message.get_list_nodes());
+				} else if (pb_message.get_reason().equals("overflow")) {
+					rate_in_row ++;
+					duedate_in_row=1;
+					neighborhood = result.generate_Neighborhood_RATE(graph,rate_in_row,pb_message.get_list_nodes());
+				}
+				
+				ListIterator<Solution> ite = neighborhood.listIterator();
+				while(ite.hasNext()) {
+					Solution temp=ite.next();
+
+					//System.out.println("Check de la solution "+temp.date_end_evac);
+					//temp.print_solution();
+					int heuristique= temp.get_date_end_evac();
+					
+					//put a true solution above a false one
+					if(!result.is_valid && temp.is_valid ) {
+						result=temp;
+						z=heuristique;
+					//in order not to loop on the same solution
+					}else if (result.equals(temp)) {								
+						result = last_sol;
+					//don't try to compare a true solution with a false one
+					}else if(!(result.is_valid && !temp.is_valid) && (heuristique < z) ){
+						last_sol = temp;
+						result=temp;
+						z=heuristique;
+					}				
+				}
+			}
+			pb_message = Checker.check_solution(result, graph);
+		}		
+		return result;
+	}
+	
+	//SOLUTION RANDOM
 	
 	//generates a list of solution
 	public ArrayList<Solution> generateNeighborhoodRandom(int nb_neighbor,Graph graph, int max_delta_rate, int max_delta_start){
@@ -153,9 +281,9 @@ public class Solution {
 			temp.set_list_evac_node(ModifiedEvacNodeList);
 			temp.compute_end_date_evac(graph);
 			temp.set_method(method);
-			temp.set_validity(Checker.check_solution(temp, graph));
+			temp.set_validity(Checker.check_solution(temp, graph).get_validity());
 			if(temp.get_validity()) {
-				System.out.println("CHEF! ON EN A TROUVE UN!");
+				//System.out.println("CHEF! ON EN A TROUVE UN!");
 			}
 			result.add(temp);
 		}

@@ -1,12 +1,7 @@
 package Graph;
 import java.io.IOException;
 import java.util.*;
-
-import javax.xml.crypto.NodeSetData;
-
 import exception.GraphGenerationError;
-import solution.EvacNode;
-
 import java.io.*;
 
 public class Graph {

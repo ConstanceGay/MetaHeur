@@ -1,5 +1,4 @@
 package solution;
-import Graph.*;
 
 public class EvacNode {
 	private int id_node;
