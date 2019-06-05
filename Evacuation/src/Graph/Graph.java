@@ -4,6 +4,7 @@ import java.util.*;
 
 import javax.xml.crypto.NodeSetData;
 
+import exception.GraphGenerationError;
 import solution.EvacNode;
 
 import java.io.*;
@@ -80,7 +81,7 @@ public class Graph {
 	}
 
 	//GENERATOR
-	public static Graph generate_from_file(String path) {
+	public static Graph generate_from_file(String path) throws GraphGenerationError {
 		String line = null;
 		try {
 			FileReader fileReader=new FileReader(path);			
@@ -140,7 +141,6 @@ public class Graph {
 			while (ite_list_evac.hasNext()) {													//loop on all the evac nodes
 				
 				Node cur_evac_node = ite_list_evac.next();
-				System.out.println("Looping on evac node : "+cur_evac_node.get_id());
 				ArrayList<Integer> current_path= cur_evac_node.get_evac_path();					//get the evacuation path of the current node
 				
 				for (int j=0;j<current_path.size()-1;j++) {										//loop on all the nodes of the evacuation path
@@ -160,13 +160,7 @@ public class Graph {
 						espace=line.indexOf(" ");
 						int node2=Integer.parseInt(line.substring(0, (espace) ) );				//get the second node
 						line=line.substring((espace+1),(line.length()));
-						/*
-						if(current_path.get(j) < current_path.get(j+1)) {
-							int aux = node1;
-							node1 = node2;
-							node2 = aux;
-						}*/
-						
+												
 						if(node1==current_path.get(j) && node2==current_path.get(j+1) ||node1==current_path.get(j+1) && node2==current_path.get(j)) {		//if they match the pair on the evac path:
 							trouve=true;
 							espace=line.indexOf(" ");
@@ -192,7 +186,6 @@ public class Graph {
 							}
 										
 							if(current_path.get(j)==cur_evac_node.get_id()) {									//checks if the node is an evacuation node
-									System.out.println("Matched evac node "+cur_evac_node.get_id()+" ? "+is_in_list);
 									cur_evac_node.set_arc(new_arc);								//add the arc to the current evac_node (it'll change in both lists)
 									if(is_in_list) {
 										ListNodeFinal.removeIf(n -> n.get_id()==cur_evac_node.get_id());
@@ -207,10 +200,10 @@ public class Graph {
 						}
 						line=bufferedReader.readLine();
 					}
-					if (!trouve) {
-						System.out.println("ATTENTION !! L'arc sortant du noeud : "+current_path.get(j)+" n'a pas été trouvé");
-					}
 					bufferedReader.close();
+					if (!trouve) {
+						throw new GraphGenerationError("Didn't find the arc coming out of node: " + current_path.get(j) );
+					}
 				}
 			}			
 			Collections.sort(ListNodeFinal, new Comparator<Node>(){								//puts list in order
@@ -288,5 +281,7 @@ public class Graph {
 		System.out.println("-------------------------------------");
 		System.out.println("GRAPH INFORMATION\n");
 		System.out.println("Total number of nodes: "+this.get_nb_node());
+		System.out.println("-------------------------------------");
+		System.out.println();
 	}
 }

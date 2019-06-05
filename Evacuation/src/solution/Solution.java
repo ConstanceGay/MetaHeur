@@ -54,7 +54,8 @@ public class Solution {
 			ListEvacNodeSolution.add(new EvacNode(currentNode.get_id(),rate,0));
 			
 			//total evacuation time for each evac node
-			int time=currentNode.get_arc().get_length()+currentNode.get_population()/rate;		
+			int time=currentNode.get_arc().get_length()+currentNode.get_population()/rate;	
+			System.out.println("On a un temps d'evac de "+time+" avec un arc de longueur "+currentNode.get_arc().get_length()+" une population de "+currentNode.get_population()+" une rate de "+rate);
 			if(currentNode.get_population()%rate!=0) {										
 				time++;
 			}
