@@ -35,7 +35,7 @@ The static method **check_solution(solution,graph)** in the objet *Checker* in *
 - **_Neighborhoods:_** We made three neighborhood generation functions. Both of them are in the object *Solution* in **Evacuation/src/solution**
   - **Random neighborhood generation:** the function **generateNeighborhoodRandom(...)** generates a neighborhood of a certain size but randomly changing the rates and start_evac_dates of the evac nodes.
   - **Neighborhood changing rates:** the function **generate_Neighborhood_RATE(...)** generates a neighborhood by lowering the evacuation rates some evac nodes (chosen randomly) more and more.
-  **Neighborhood changing dates of start:** the function **generate_Neighborhood_DATE(...)** generates a neighborhood by lowering the start_evac_date some evac nodes (chosen randomly) more and more.
+  - **Neighborhood changing dates of start:** the function **generate_Neighborhood_DATE(...)** generates a neighborhood by lowering the start_evac_date some evac nodes (chosen randomly) more and more.
 
 - **_Local Searches:_** We made three local search functions. Both of them are in the object *Solution* in **Evacuation/src/solution**
   - **Random local search:** the function **recherche_locale_sans_diversification()** takes a solution and generates neighborhoods using **generateNeighborhoodRandom(...)** with a constant delta. It then compares the date of the end of evacuation of all those neighborhoods and takes the lowest one (putting priority on valid solutions). It does this for a certain number of iterations (can be changed in code).
