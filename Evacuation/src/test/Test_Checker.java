@@ -42,7 +42,7 @@ public class Test_Checker {
 			
 			String path = new File("../Instances_Int/"+graph_file_name+".full").getAbsolutePath();  
 			Graph graph = Graph.generate_from_file(path); 
-			Solution solution = Checker.generate_solution_from_file("../Solutions/"+filename);
+			Solution solution = Solution.generate_solution_from_file("../Solutions/"+filename);
 			System.out.println("-------------------------------------");
 			System.out.println("Testing solution "+filename+" graph generated from file "+graph_file_name);
 			System.out.println("Solution is "+Checker.check_solution(solution, graph).get_validity());

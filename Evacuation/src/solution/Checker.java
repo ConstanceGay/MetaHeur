@@ -7,62 +7,6 @@ import java.io.*;
 
 public class Checker {
 	
-	public static Solution generate_solution_from_file(String path) {
-		String line = null;
-		try {
-			FileReader fileReader=new FileReader(path);			
-			BufferedReader bufferedReader=new BufferedReader(fileReader);
-
-			String file_name=bufferedReader.readLine(); 										
-			
-			line=bufferedReader.readLine();														//id of the safe node
-			
-			int nb_evac_nodes=Integer.parseInt(line.substring(0, (line.length())));
-			
-			ArrayList<EvacNode> ListEvacNode = new ArrayList<EvacNode>();						//List of nodes to evacuate
-			
-			for(int i=0;i<nb_evac_nodes;i++) {													//iteration on all the evac_nodes
-				line=bufferedReader.readLine();
-				
-				int espace=line.indexOf(" ");
-				int id_node=Integer.parseInt(line.substring(0, (espace) ) );					//id of the node
-				line=line.substring((espace+1),(line.length()));
-				
-				espace=line.indexOf(" ");
-				int max_rate=Integer.parseInt(line.substring(0, (espace) ) );					//max_rate of the node
-				line=line.substring((espace+1),(line.length()));
-				
-				espace=line.indexOf(" ");
-				int end_date=Integer.parseInt(line.substring(0, (line.length())));
-				line=line.substring((espace+1),(line.length()));
-				
-				ListEvacNode.add(new EvacNode(id_node,max_rate,end_date));			//add node to the list of nodes to evacuate
-				//System.out.println("For node n°"+i+" the path is: "+chemin.toString()+"\n");		
-			}
-			
-			boolean isValid;
-			String isValidStr=bufferedReader.readLine();
-			isValid = isValidStr.contains("valid");
-			
-			line=bufferedReader.readLine();
-			int value=Integer.parseInt(line.substring(0, (line.length()) ) );
-			
-			line=bufferedReader.readLine();
-			int time=Integer.parseInt(line.substring(0, (line.length()) ) );
-			
-			String method=bufferedReader.readLine();
-			String free_space=bufferedReader.readLine();
-			
-			bufferedReader.close();
-			
-			return new Solution(file_name,nb_evac_nodes,ListEvacNode,isValid,value,time,method,free_space);
-		}
-		catch(IOException e) {
-			System.out.println(e.toString());
-			return null;
-		}
-	}
-	
 	public static ArrayList<Integer> create_int_list(ArrayList<Node> list) {
 		ArrayList<Integer> int_list = new ArrayList<Integer>();
 		ListIterator<Node> ite = list.listIterator();
