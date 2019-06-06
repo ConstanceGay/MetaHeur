@@ -6,5 +6,5 @@ example2.5
 valid
 37
 0
-Random with 50 neigbhors with parameters max_delta rate : 72 max_delta_start : 50
+Random with 50 neigbhors with parameters max_delta rate : 8 max_delta_start : 94
 

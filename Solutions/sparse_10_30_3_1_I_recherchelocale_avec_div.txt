@@ -1,17 +1,17 @@
 sparse_10_30_3_1_I
 10
-107 54 0
-167 10 47
-156 72 35
-128 98 0
-130 95 57
-134 66 18
-177 62 0
+107 72 0
+167 32 0
+156 72 0
+128 134 0
+130 60 0
+134 72 0
+177 47 0
 190 74 0
-77 150 43
-138 206 56
+77 144 39
+138 368 0
 invalid
 111
 0
-Random with 50 neigbhors with parameters max_delta rate : 72 max_delta_start : 50
+Random with 50 neigbhors with parameters max_delta rate : 72 max_delta_start : 602
 

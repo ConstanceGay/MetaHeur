@@ -5,6 +5,6 @@ example2.5
 3 3 0
 invalid
 34
-15
+3
 infimum
 

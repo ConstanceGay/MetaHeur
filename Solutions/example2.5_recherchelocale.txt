@@ -1,10 +1,10 @@
 example2.5
 3
 1 8 0
-2 5 13
+2 5 16
 3 3 11
 valid
-44
+47
 0
 Rate change neigbhors with parameters max_delta rate : 10
 

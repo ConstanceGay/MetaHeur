@@ -9,7 +9,7 @@ import solution.Solution;
 
 public class Test_Local_Search {
 	public static void main(String args[]) {
-		String filename="sparse_10_30_3_1_I";
+		String filename="exemple2.5";
 		String path = new File("../Instances_Int/"+filename+".full").getAbsolutePath();   
 		
 		try {
