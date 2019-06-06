@@ -1,10 +1,9 @@
 package solution;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.ListIterator;
+import graph.*;
 import java.io.*;
-import Graph.*;
 
 public class Checker {
 	
@@ -13,10 +12,10 @@ public class Checker {
 		try {
 			FileReader fileReader=new FileReader(path);			
 			BufferedReader bufferedReader=new BufferedReader(fileReader);
-	
-			String file_name=bufferedReader.readLine(); 	//id of the safe node
+
+			String file_name=bufferedReader.readLine(); 										
 			
-			line=bufferedReader.readLine();
+			line=bufferedReader.readLine();														//id of the safe node
 			
 			int nb_evac_nodes=Integer.parseInt(line.substring(0, (line.length())));
 			
@@ -174,13 +173,5 @@ public class Checker {
 		} 		
 		return new Checker_message(valid,reason,pb_list);
 	}
-	
-	public static void main(String arg[]) {
-		String filename="example2.5";
-		String path = new File("src/Examples/"+filename+".txt").getAbsolutePath();
-		Solution solution = generate_solution_from_file(path); 
-		solution.print_solution();
-	}
-	
 	
 }

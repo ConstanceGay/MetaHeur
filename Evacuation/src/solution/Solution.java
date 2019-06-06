@@ -1,7 +1,8 @@
 package solution;
 import java.io.PrintWriter;
 import java.util.*;
-import Graph.*;
+
+import graph.*;
 
 public class Solution {
 	private String filename;
@@ -15,7 +16,6 @@ public class Solution {
 	
 	
 	//CONSTRUCTORS
-	
 	public Solution(String filename,int nb_evac_node,ArrayList<EvacNode> list_evac_node,boolean is_valid,int date_end_evac,String method,String free_space) {
 		this.filename=filename;
 		this.nb_evac_node=nb_evac_node;
@@ -37,88 +37,7 @@ public class Solution {
 		this.free_space=free_space;
 	}
 	
-//BORNES	
-	
-	//Function to generate an infimum (borne inférieure)
-	public static Solution generate_infimum(Graph graph,String filename) {
-		long SystemTime = System.currentTimeMillis();
-		
-		ArrayList<Node> ListEvacNodeGraph=graph.get_evac_nodes();
-		ArrayList<EvacNode> ListEvacNodeSolution= new ArrayList<EvacNode>(); 
-		
-		ListIterator<Node> ite = ListEvacNodeGraph.listIterator();
-		//Each node will start the evacuation at time 0 
-		//end of the evacuation will be the critical time between all evacuation nodes
-		int criticalTime=0;
-		while(ite.hasNext()) {
-			Node currentNode=ite.next();
-			int rate=Math.min(currentNode.get_arc().get_capacity(), currentNode.get_max_rate());	//evacuation rate is the min between arc capacity and max evacuation rate
-			ListEvacNodeSolution.add(new EvacNode(currentNode.get_id(),rate,0));
-			
-			//total evacuation time for each evac node
-			int time=currentNode.get_population()/rate;	
-			//System.out.println("On a un temps d'evac de "+time+" avec un arc de longueur "+currentNode.get_arc().get_length()+" une population de "+currentNode.get_population()+" une rate de "+rate);
-			if(currentNode.get_population()%rate!=0) {										
-				time++;
-			}
-			
-			//Add the time it takes to cross each arc on the evacuation path
-			ArrayList<Integer> evacPath=currentNode.get_evac_path();
-			ListIterator<Integer> itePath=evacPath.listIterator();
-			while(itePath.hasNext()) {
-				int currentid=itePath.next();
-				if(currentid != graph.get_safe_node()) {
-					time+=graph.get_node_by_id(currentid).get_arc().get_length();
-				}
-			}
-			if(time>criticalTime) {
-				criticalTime=time;				//stores the total evacuation time
-			}
-		}		
-		Solution result = new Solution(filename,graph.get_nb_evac_nodes(),ListEvacNodeSolution,false,criticalTime,System.currentTimeMillis()-SystemTime,"infimum","");
-		result.set_validity(Checker.check_solution(result, graph).get_validity());
-		return result;
-	}
-	
-// LOCAL SEARCH	
-	
-	//Function to generate a maximum (borne supérieure)
-	public static Solution generate_maximum(Graph graph,String filename) {
-		long SystemTime = System.currentTimeMillis();
-		
-		ArrayList<Node> ListEvacNodeGraph = graph.get_evac_nodes();
-		ArrayList<EvacNode> ListEvacNodeSolution = new ArrayList<EvacNode>();
-		
-		ListIterator<Node> ite = ListEvacNodeGraph.listIterator();
-		//each node will evacuated when the preceding evacuation is done
-		//the end of the evacuation will be when the last node is completely evacuated
-		int time = 0;
-		while(ite.hasNext()) {
-			Node currentNode = ite.next();
-			//this time the rate is the minimum between arc capacity and max evacuation rate
-			int rate=Math.min(currentNode.get_arc().get_capacity(), currentNode.get_max_rate());
-			ListEvacNodeSolution.add(new EvacNode(currentNode.get_id(),rate,time));
-			
-			time += currentNode.get_population()/rate;
-			if(currentNode.get_population()%rate != 0) {
-				time++;
-			}
-			
-			ArrayList<Integer> evacPath = currentNode.get_evac_path();
-			ListIterator<Integer> iteEvacPath = evacPath.listIterator();
-			while (iteEvacPath.hasNext()) {
-				int currentEvacNode = iteEvacPath.next();
-				if(currentEvacNode != graph.get_safe_node()) {
-					time += graph.get_node_by_id(currentEvacNode).get_arc().get_length();
-				}
-			}
-		}
-		Solution result = new Solution(filename,graph.get_nb_evac_nodes(),ListEvacNodeSolution,false,time,(System.currentTimeMillis()-SystemTime),"maximum","");
-		result.set_validity(Checker.check_solution(result, graph).get_validity());
-		return result;
-	}
-	
-	
+//NEIGHBORHOODS CHANGING EITHER DATE OR RATE---------------------------------------------------------------------------------------------------------------------------------------
 	public ArrayList<Solution> generate_Neighborhood_DATE (Graph graph, int max_delta_date,ArrayList<Integer> list_pb){
 		int i;
 		String method="Rate change neigbhors with parameters max_delta rate : " + max_delta_date;
@@ -186,14 +105,12 @@ public class Solution {
 	}
 	
 	public Solution recherche_locale(Graph graph) {
-		int max_delta_rate=2000;
-		int max_delta_start=1000;
 		int nb_iteration = 100;
-		
-		Solution last_sol = this;
 		int duedate_in_row = 1;
 		int rate_in_row=1;
+		Solution last_sol = this;
 		
+		@SuppressWarnings("unchecked")
 		Solution result=new Solution(this.get_filename(),this.get_nb_evac_node(),(ArrayList<EvacNode>) this.get_list_evac_node().clone(), false ,this.get_date_end_evac(),this.get_calcul_time(),method,"");
 		Checker_message pb_message = Checker.check_solution(this, graph);
 		int z=result.get_date_end_evac();
@@ -215,9 +132,7 @@ public class Solution {
 				ListIterator<Solution> ite = neighborhood.listIterator();
 				while(ite.hasNext()) {
 					Solution temp=ite.next();
-
-					//System.out.println("Check de la solution "+temp.date_end_evac);
-					//temp.print_solution();
+					
 					int heuristique= temp.get_date_end_evac();
 					
 					//put a true solution above a false one
@@ -240,7 +155,8 @@ public class Solution {
 		return result;
 	}
 	
-	//SOLUTION RANDOM
+
+//RANDOM SOLUTION---------------------------------------------------------------------------------------------------------------------------------------
 	
 	//generates a list of solution
 	public ArrayList<Solution> generateNeighborhoodRandom(int nb_neighbor,Graph graph, int max_delta_rate, int max_delta_start){
@@ -282,9 +198,6 @@ public class Solution {
 			temp.compute_end_date_evac(graph);
 			temp.set_method(method);
 			temp.set_validity(Checker.check_solution(temp, graph).get_validity());
-			if(temp.get_validity()) {
-				//System.out.println("CHEF! ON EN A TROUVE UN!");
-			}
 			result.add(temp);
 		}
 		return result;
@@ -297,13 +210,13 @@ public class Solution {
 		int size_neighborhood=50;
 		int nb_iteration = 1000;
 		
+		@SuppressWarnings("unchecked")
 		Solution result=new Solution(this.get_filename(),this.get_nb_evac_node(),(ArrayList<EvacNode>) this.get_list_evac_node().clone(), false ,this.get_date_end_evac(),this.get_calcul_time(),method,"");
 		
 		int z=result.get_date_end_evac();
 		
 		for(int i=0; i<nb_iteration; i++) {
 			//choix solution
-			//System.out.println("Debut boucle avec comme objectif de faire mieux que : " + z);
 			ArrayList<Solution> neighborhood= new ArrayList<Solution>();
 			
 			//generate a certain number of solutions
@@ -317,7 +230,6 @@ public class Solution {
 				
 				//put a true solution above a false one
 				if(!result.is_valid && temp.is_valid ) {
-					System.out.println(result.is_valid +" "+temp.is_valid);
 					result=temp;
 					z=heuristique;
 				//don't try to compare a true solution with a false one
@@ -342,6 +254,7 @@ public class Solution {
 		
 		Random Generator = new Random();
 		
+		@SuppressWarnings("unchecked")
 		Solution result=new Solution(this.get_filename(),this.get_nb_evac_node(),(ArrayList<EvacNode>) this.get_list_evac_node().clone(), false ,this.get_date_end_evac(),this.get_calcul_time(),method,"");
 		
 		int z=result.get_date_end_evac();
@@ -371,14 +284,14 @@ public class Solution {
 					}				
 				}
 			}
-			System.out.println("Resultat voisinage "+i+" : "+result.is_valid+" temps: "+result.date_end_evac+" temps de calcul: "+(System.currentTimeMillis() - SystemTime));
+			//System.out.println("Resultat voisinage "+i+" : "+result.is_valid+" temps: "+result.date_end_evac+" temps de calcul: "+(System.currentTimeMillis() - SystemTime));
 		}	
 		result.set_calcul_time(System.currentTimeMillis() - SystemTime);
 		return result;
 	}
 	
-	//GETTER
-	
+
+//GETTERS AND SETTERS---------------------------------------------------------------------------------------------------------------------------------------	
 	public String get_filename() {
 		return this.filename;
 	}

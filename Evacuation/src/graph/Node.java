@@ -1,4 +1,4 @@
-package Graph;
+package graph;
 
 import java.util.ArrayList;
 
@@ -11,7 +11,6 @@ public class Node {
 	private ArrayList<Integer> evac_path;
 	
 	//CONSTRUCTORS
-	
 	public Node(int id,Arc arc_evac,int population, int max_rate, ArrayList<Integer> evac_path) {
 		this.id=id;
 		this.arc_evac=arc_evac;

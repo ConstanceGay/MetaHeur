@@ -1,4 +1,4 @@
-package Graph;
+package graph;
 import java.io.IOException;
 import java.util.*;
 import exception.GraphGenerationError;
@@ -75,7 +75,7 @@ public class Graph {
 		this.safe_node=id;
 	}
 
-	//GENERATOR
+	//GENERATOR makes graph from file
 	public static Graph generate_from_file(String path) throws GraphGenerationError {
 		String line = null;
 		try {
@@ -156,7 +156,8 @@ public class Graph {
 						int node2=Integer.parseInt(line.substring(0, (espace) ) );				//get the second node
 						line=line.substring((espace+1),(line.length()));
 												
-						if(node1==current_path.get(j) && node2==current_path.get(j+1) ||node1==current_path.get(j+1) && node2==current_path.get(j)) {		//if they match the pair on the evac path:
+						//if they match the pair on the evac path:
+						if(node1==current_path.get(j) && node2==current_path.get(j+1) ||node1==current_path.get(j+1) && node2==current_path.get(j)) {		
 							trouve=true;
 							espace=line.indexOf(" ");
 							long due_date=Long.parseLong(line.substring(0, (espace) ) );		//retrieve due date of arc
@@ -201,7 +202,8 @@ public class Graph {
 					}
 				}
 			}			
-			Collections.sort(ListNodeFinal, new Comparator<Node>(){								//puts list in order
+			
+			Collections.sort(ListNodeFinal, new Comparator<Node>(){								//puts list in order of id
 				@Override
 				public int compare(Node arg0, Node arg1) {
 					return Integer.compare(arg0.get_id(), arg1.get_id());
@@ -217,6 +219,8 @@ public class Graph {
 		}
 	}
 	
+	
+	//Function that shows all the nodes in the graph and their characteristics if they are evac_nodes
 	public void show_all_nodes() {
 		System.out.println("NODES\n");
 		ListIterator<Node> ite = this.get_nodes().listIterator();				
@@ -232,6 +236,7 @@ public class Graph {
 		}
 	}
 	
+	//Function to print the entire graph
 	public void show_graph() {
 		System.out.println("EVACUATION INFORMATION\n");
 		System.out.println("Number of nodes to evacuate: "+this.get_nb_evac_nodes()+"\n");

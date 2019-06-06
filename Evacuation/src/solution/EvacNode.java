@@ -5,6 +5,8 @@ public class EvacNode {
 	private int rate;
 	private int start_evac;
 	
+	
+	//Type of node used only in the checker and solution
 	public EvacNode(int id_node,int rate, int start_evac) {
 		this.id_node=id_node;
 		this.rate=rate;

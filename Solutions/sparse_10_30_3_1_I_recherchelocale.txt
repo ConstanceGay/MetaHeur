@@ -1,0 +1,17 @@
+sparse_10_30_3_1_I
+10
+107 72 0
+167 72 27
+156 72 55
+128 134 80
+130 212 97
+134 72 186
+177 71 267
+190 74 348
+77 206 392
+138 224 417
+invalid
+459
+0
+Rate change neigbhors with parameters max_delta rate : 17
+
