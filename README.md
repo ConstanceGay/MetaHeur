@@ -8,6 +8,8 @@
 - **Instances_Int** folder contains instances of graphs to solve (.full format)
 - **Solutions** folder contains the solutions our program generates (.text format)
 - **Evacuation** folder contains our solution
+- **Sujet** file contains the context and specifications of the project
+- **Report** file contains our report on how we tried to solve the project
 
 ## Functions implementing the specifications
 
@@ -33,11 +35,13 @@ The static method **check_solution(solution,graph)** in the objet *Checker* in *
 - **_Neighborhoods:_** We made three neighborhood generation functions. Both of them are in the object *Solution* in **Evacuation/src/solution**
   - **Random neighborhood generation:** the function **generateNeighborhoodRandom(...)** generates a neighborhood of a certain size but randomly changing the rates and start_evac_dates of the evac nodes.
   - **Neighborhood changing rates:** the function **generate_Neighborhood_RATE(...)** generates a neighborhood by lowering the evacuation rates some evac nodes (chosen randomly) more and more.
-  **Neighborhood changing dates of start:** the function **generate_Neighborhood_DATE(...)** generates a neighborhood by lowering the start_evac_date some evac nodes (chosen randomly) more and more.
+  - **Neighborhood changing dates of start:** the function **generate_Neighborhood_DATE(...)** generates a neighborhood by lowering the start_evac_date some evac nodes (chosen randomly) more and more.
 
 - **_Local Searches:_** We made three local search functions. Both of them are in the object *Solution* in **Evacuation/src/solution**
   - **Random local search:** the function **recherche_locale_sans_diversification()** takes a solution and generates neighborhoods using **generateNeighborhoodRandom(...)** with a constant delta. It then compares the date of the end of evacuation of all those neighborhoods and takes the lowest one (putting priority on valid solutions). It does this for a certain number of iterations (can be changed in code).
+  
   - **Random local search with diversification:** the function **recherche_locale_avec_diversification()** takes a solution and generates neighborhoods using **generateNeighborhoodRandom(...)** with random deltas for rate and date. It then compares the date of the end of evacuation of all those neighborhoods and takes the lowest one (putting priority on valid solutions). It does this for a certain number of iterations (can be changed in code).
+  
   - **Random local according to validity:** the function **local_search** takes a solution, checks it and if the reason for non-validity is overflow, generates a neighborhood using **generate_Neighborhood_RATE(...)**. If the reason is duedate however it generates the neighborhood using **generate_Neighborhood_RATE(...)**. It then compares the date of the end of evacuation of all those neighborhoods and takes the lowest one (putting priority on valid solutions). It then checks the best solution and loops. It does this for a certain number of iterations (can be changed in code).
   
 **_Test :_** Running the file *Test_Local_Search* in **Evacuation/src/solution** will take the instance whose name is written on line 12 from file **Instance_Int** and generate and print its infimum,maximum, result of all the types of local searches along with their validity and the value of their date of end of evacuation.
